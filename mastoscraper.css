@@ -1,0 +1,166 @@
+html {
+    border: none;
+    border-radius: 10px;
+    width: auto;
+}
+
+body {
+    margin-left: 10%;
+    background-color: white;
+    text-align: center;
+    font-family: 'mastodon-font-sans-serif', system-ui, sans-serif;
+    font-size: small;
+    width: 500px;
+    height: auto;
+    padding: 10px;
+}
+
+div#version-div {
+    font-size: x-small;
+}
+
+span#instructions {
+    color: #563accff;
+    font-weight: bold;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+span#instructions:hover {
+    color: #9785e0;
+}
+
+div#instructions-container {
+    background-color: #eeebfa;
+    color: #563accff;
+    padding: 4px; 
+    margin: 5px;
+}
+
+button.masto-scraper,
+select.masto-scraper {
+    color: #563accff;
+    border: solid 1px #563accff;
+    background-color: white;
+    height: 32px;
+    width: 100px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin: 5px;
+    text-align: center;
+}
+
+button#abort-btn {
+    color: #ff0000;
+    border-color: #ff0000;
+    display: none;
+}
+
+button#abort-btn:hover {
+    border-color: #ff8080;
+    background-color: #ffe6e6;
+}
+
+button#extract-btn,
+button#abort-btn,
+button#dl-btn,
+button#reset-btn,
+button#get-code-btn,
+button#auth-btn {
+    margin: 5px auto;
+}
+
+button#dl-btn {
+    width: auto;
+}
+
+button.masto-scraper:hover,
+select.masto-scraper:hover {
+    background-color: #eeebfa;
+}
+
+.masto-spinner {
+  border: 2px solid #eeebfa;
+  border-left: 2px solid #563accff;
+  border-radius: 50%;
+  width: 12px;
+  height: 12px;
+  animation: spin 1s linear infinite;
+  display: inline-block;
+  vertical-align: middle;
+  margin: 5px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+div.fold {
+    width: 500px;
+    text-align: left;
+    padding-top: 5px;
+    padding-left: 1em;
+    padding-right: 1em;
+    height: 2em;
+    background-color: #eeebfa;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    margin: auto;
+}
+
+div.fold
+ {
+    margin-bottom: 1em;
+}
+
+div#auth-fold::after,
+div#search-fold::after {
+    content: '➖';
+    float: right;
+}
+
+div#auth-unfold::after,
+div#search-unfold::after {
+    content: '➕';
+    float: right;
+}
+
+div#auth-container {
+    border: 1px solid #563accff;
+    border-radius: 4px;
+    margin: 1em auto 1em;
+    padding: 1em;
+    width: 500px;
+}
+
+div#all-done {
+    color: #006600;
+}
+
+label {
+    display: block;
+}
+
+input.masto-scraper {
+    height: 32px;
+    width: 300px;
+    padding-left: 5px;
+    border-radius: 4px;
+    margin: 5px;
+    border: solid 1px #563accff;
+    display: inline-block;
+}
+
+input.masto-scraper:focus-visible {
+    outline: solid 2px #563accff;
+}
+
+input#token-input {
+    display: inline-block;
+}
+
+input#max-toots {
+    width: 50px;
+}
