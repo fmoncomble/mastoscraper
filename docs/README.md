@@ -13,12 +13,12 @@ Moncomble, F. (2024). *MastoScraper* (Version 0.3) [JavaScript]. Arras, France: 
 
 ## Installation
 ### Firefox (recommended: automatic updates)
-[![Firefox add-on](https://github.com/fmoncomble/Figaro_extractor/assets/59739627/e4df008e-1aac-46be-a216-e6304a65ba97)](https://github.com/fmoncomble/X-scraper/releases/latest/download/mastoscraper.xpi)  
+[![Firefox add-on](https://github.com/fmoncomble/Figaro_extractor/assets/59739627/e4df008e-1aac-46be-a216-e6304a65ba97)](https://github.com/fmoncomble/mastoscraper/releases/latest/download/mastoscraper.xpi)  
 Remember to pin the add-on to the toolbar.
 
 ### Chrome/Edge
 While the add-on is being authorized on the Chrome WebStore, you can test it by installing it in developer mode:
-- [Download the .zip archive](https://github.com/fmoncomble/X-scraper/releases/latest/download/mastoscraper.zip)
+- [Download the .zip archive](https://github.com/fmoncomble/mastoscraper/releases/latest/download/mastoscraper.zip)
 - Unzip the archive
 - Open the extensions manager: `chrome://extensions` or `edge://extensions`
   - Activate "developer mode"
