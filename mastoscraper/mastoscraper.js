@@ -241,6 +241,9 @@ document.addEventListener('DOMContentLoaded', async function () {
                 authContainer.style.display = 'none';
                 authFold.style.display = 'none';
                 authUnfold.style.display = 'block';
+                searchContainer.style.display = 'block';
+                searchFold.style.display = 'block';
+                searchUnfold.style.display = 'none';
             }, 1000);
         } else {
             allDone.style.display = 'none';
