@@ -1,3 +1,6 @@
+
+![mastologo](https://github.com/fmoncomble/mastoscraper/assets/59739627/15c77ec3-9dba-4e97-868f-984dddd87816)
+
 [(Version française)](https://fmoncomble.github.io/mastoscraper/README_fr.html)
 
 An extension for extracting and downloading toots (posts on Mastodon) for text mining and analysis.  
