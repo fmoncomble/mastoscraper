@@ -28,7 +28,7 @@ While the add-on is being authorized on the Chrome WebStore, you can test it by 
  
 ## Instructions for use
 - Click the add-on's icon in the toolbar.
-- On first using the add-on, follow the authentication procedure to authorize the app on Mastodon. *All credentials are stored locally on your computer, ***not*** on a remote server.*
+- On first using the add-on, follow the authentication procedure to authorize the app on Mastodon. *All credentials are stored locally on your computer, **not** on a remote server.*
 - Build your search query with at least one keyword, and click `Search`.
 - Choose your preferred output format:
     - `XML/XTZ` for an XML file to import into [TXM](https://txm.gitpages.huma-num.fr/textometrie/en/index.html) using the `XML/TEI-Zero` module
