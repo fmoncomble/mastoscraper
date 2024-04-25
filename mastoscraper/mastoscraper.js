@@ -610,6 +610,8 @@ document.addEventListener('DOMContentLoaded', async function () {
             file = {};
         } else if (fileFormat === 'txt') {
             file = '';
+        } else if (fileFormat === 'csv') {
+            csvData = [];
         }
 
         let p = 1;
