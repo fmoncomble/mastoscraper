@@ -28,8 +28,8 @@ document.addEventListener('DOMContentLoaded', async function () {
     const authBtn = document.getElementById('auth-btn');
     const allWordsInput = document.getElementById('all-words');
     const thisPhraseInput = document.getElementById('this-phrase');
-    const anyWordInput = document.getElementById('any-word');
-    const noWordInput = document.getElementById('no-word');
+    // const anyWordInput = document.getElementById('any-word');
+    // const noWordInput = document.getElementById('no-word');
     const langInput = document.getElementById('lang');
     const accountInput = document.getElementById('account');
     const searchBtn = document.getElementById('search-btn');
@@ -435,8 +435,8 @@ document.addEventListener('DOMContentLoaded', async function () {
         // Concatenate query URL from search elements
         let allWords = allWordsInput.value.replaceAll(' ', ' AND ');
         let thisPhrase = thisPhraseInput.value;
-        let anyWord = anyWordInput.value.replaceAll(' ', ' OR ');
-        let noWord = noWordInput.value.replaceAll(' ', ' NOT ');
+        // let anyWord = anyWordInput.value.replaceAll(' ', ' OR ');
+        // let noWord = noWordInput.value.replaceAll(' ', ' NOT ');
         lang = langInput.value;
         let account = accountInput.value.replaceAll(' ', ' AND ');
         if (allWords || thisPhrase || anyWord || noWord) {
@@ -451,18 +451,18 @@ document.addEventListener('DOMContentLoaded', async function () {
             }
             queryUrl = queryUrl + '"' + thisPhrase + '"';
         }
-        if (anyWord) {
-            if (allWords || thisPhrase) {
-                queryUrl = queryUrl + ' AND ';
-            }
-            queryUrl = queryUrl + anyWord;
-        }
-        if (noWord) {
-            if (allWords || thisPhrase || anyWord) {
-                queryUrl = queryUrl + ' NOT ';
-            }
-            queryUrl = queryUrl + noWord;
-        }
+        // if (anyWord) {
+        //     if (allWords || thisPhrase) {
+        //         queryUrl = queryUrl + ' AND ';
+        //     }
+        //     queryUrl = queryUrl + anyWord;
+        // }
+        // if (noWord) {
+        //     if (allWords || thisPhrase || anyWord) {
+        //         queryUrl = queryUrl + ' NOT ';
+        //     }
+        //     queryUrl = queryUrl + noWord;
+        // }
         if (account) {
             getIdUrl =
                 'https://' +
