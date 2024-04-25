@@ -640,16 +640,13 @@ document.addEventListener('DOMContentLoaded', async function () {
 
         async function processPage() {
             try {
-                console.log('Processing page #', p);
                 if (maxToots) {
                     maxToots = Number(maxToots);
                 }
                 if (p === 1) {
                     nextQueryUrl = queryUrl;
                 } else if (p > 1) {
-                    console.log('Last toot id = ', id);
                     maxId = BigInt(id) - BigInt(1);
-                    console.log('Max id = ', maxId.toString());
                     nextQueryUrl = queryUrl + '&max_id=' + maxId.toString();
                 }
                 console.log('Extracting query URL = ', nextQueryUrl);
@@ -681,18 +678,13 @@ document.addEventListener('DOMContentLoaded', async function () {
                     const parser = new DOMParser();
                     id = s.id;
                     if (tootSet.has(id)) {
-                        console.log('Skipping duplicate toot id ' + id);
                         continue;
                     }
                     tootSet.add(id);
-                    console.log('Processing toot #' + tootCount + ', id ' + id);
                     username = s.account.acct;
                     date = s.created_at.split('T')[0];
                     let sLang = s.language;
                     if (lang && sLang !== lang) {
-                        console.log(
-                            'Skipping toot in ' + sLang + ' not in ' + lang
-                        );
                         continue;
                     }
                     let rawText = s.content;
@@ -744,7 +736,6 @@ ${text}
                     } else if (fileFormat === 'csv') {
                         text = text.replaceAll('\n', ' ');
                         csvData.push({ username, date, text });
-                        console.log('CSV data = ', csvData);
                     }
                     if (maxToots !== Infinity) {
                         let tootPercent = Math.round((tootCount / maxToots) * 100);
@@ -757,11 +748,6 @@ ${text}
                     } else if (!lang) {
                         tootCount++;
                     }
-                    // if (maxToots && maxToots !== Infinity) {
-                    //     resultsMsg.textContent = `Extracting ${tootCount} toot(s) out of ${maxToots}...`;
-                    // } else {
-                    //     resultsMsg.textContent = `Extracting ${tootCount} toot(s)`;
-                    // }
                     if (tootCount > maxToots) {
                         return;
                     }
