@@ -26,7 +26,7 @@ En attendant la disponibilité sur le Chrome WebStore, vous pouvez tester l'exte
  
 ## Mode d'emploi
 - Cliquez sur l'icône de l'extension dans la barre d'outils.
-- Lors de la première utilisation, suivez la procédure d'authentification pour autoriser l'application sur Mastodon. *Tous les identifiants sont stockés en local sur votre ordinateur, ***pas*** sur un serveur distant.*
+- Lors de la première utilisation, suivez la procédure d'authentification pour autoriser l'application sur Mastodon. *Tous les identifiants sont stockés en local sur votre ordinateur, **pas** sur un serveur distant.*
 - Construisez votre requête avec au moins un mot clef, puis cliquez sur `Search`.
 - Choisissez le format de sortie désiré :
     - `XML/XTZ` pour un fichier XML à importer dans [TXM](https://txm.gitpages.huma-num.fr/textometrie/en/index.html) en utilisant le module `XML/TEI-Zero`.
