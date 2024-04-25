@@ -431,7 +431,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     async function buildQueryUrl() {
         mastoInstance = await retrieveCredential('mastoinstance');
         if (!mastoInstance) {
-            window.alert('Enter your Mastodon instance');
+            window.alert('Please enter your Mastodon instance');
         }
         queryUrl = 'https://' + mastoInstance + '/api/v2/search?';
 
@@ -561,7 +561,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     let statuses;
     let id;
     let csvData = [];
-    let tootCount = 0;
+    let tootCount = 1;
     let nextQueryUrl;
 
     // Assign function to extract button
@@ -582,7 +582,8 @@ document.addEventListener('DOMContentLoaded', async function () {
             extractBtn.style.display = 'block';
             extractBtn.disabled = true;
             extractSpinner.style.display = 'none';
-            resultsMsg.textContent = tootCount + ' toot(s) scraped';
+            tootCount = tootCount - 1;
+            resultsMsg.textContent = tootCount + ' toot(s) extracted';
             dlBtn.style.display = 'inline-block';
             resetBtn.style.display = 'inline-block';
         } catch (error) {
@@ -598,6 +599,7 @@ document.addEventListener('DOMContentLoaded', async function () {
 
     // Function to scrape toots
     async function scrape() {
+        let tootSet = new Set();
         abort = false;
         extractBtn.style.display = 'none';
         abortBtn.style.display = 'block';
@@ -616,9 +618,9 @@ document.addEventListener('DOMContentLoaded', async function () {
 
         let p = 1;
         while (tootCount <= maxToots) {
-            await processPage(p);
+            await processPage();
 
-            if (tootCount >= maxToots || abort) {
+            if (tootCount > maxToots || abort) {
                 if (fileFormat === 'xml') {
                     file =
                         file +
@@ -636,17 +638,21 @@ document.addEventListener('DOMContentLoaded', async function () {
             }
         }
 
-        async function processPage(p) {
+        async function processPage() {
             try {
+                console.log('Processing page #', p);
                 if (maxToots) {
                     maxToots = Number(maxToots);
                 }
                 if (p === 1) {
                     nextQueryUrl = queryUrl;
                 } else if (p > 1) {
-                    maxId = id - 1;
-                    nextQueryUrl = queryUrl + '&max_id=' + maxId;
+                    console.log('Last toot id = ', id);
+                    maxId = BigInt(id) - BigInt(1);
+                    console.log('Max id = ', maxId.toString());
+                    nextQueryUrl = queryUrl + '&max_id=' + maxId.toString();
                 }
+                console.log('Extracting query URL = ', nextQueryUrl);
                 const response = await fetch(nextQueryUrl, {
                     headers: {
                         Authorization: `Bearer ${userToken}`,
@@ -660,8 +666,7 @@ document.addEventListener('DOMContentLoaded', async function () {
                     throw new Error('Could not fetch: not authenticated');
                 } else if (!response.ok) {
                     window.alert(
-                        'Error fetching results: HTTP error ',
-                        response.status
+                        `Error fetching results: HTTP error ${response.status}`
                     );
                     throw new Error(
                         'HTTP error, could not fetch search results'
@@ -669,9 +674,18 @@ document.addEventListener('DOMContentLoaded', async function () {
                 }
                 const data = await response.json();
                 statuses = data.statuses;
+                if (statuses.length == 0) {
+                    abort = true;
+                }
                 for (s of statuses) {
                     const parser = new DOMParser();
                     id = s.id;
+                    if (tootSet.has(id)) {
+                        console.log('Skipping duplicate toot id ' + id);
+                        continue;
+                    }
+                    tootSet.add(id);
+                    console.log('Processing toot #' + tootCount + ', id ' + id);
                     username = s.account.acct;
                     date = s.created_at.split('T')[0];
                     let sLang = s.language;
@@ -714,7 +728,7 @@ document.addEventListener('DOMContentLoaded', async function () {
                         file =
                             file +
                             `<lb></lb><lb></lb>
-<toot username="${username}" date="${date}"><lb></lb>
+<toot id="${id}" username="${username}" date="${date}"><lb></lb>
 <ref target="${url}">${url}</ref><lb></lb><lb></lb>
 ${text}
 </toot>
@@ -732,20 +746,23 @@ ${text}
                         csvData.push({ username, date, text });
                         console.log('CSV data = ', csvData);
                     }
+                    if (maxToots !== Infinity) {
+                        let tootPercent = Math.round((tootCount / maxToots) * 100);
+                        resultsMsg.textContent = `${tootPercent}% extracted...`;
+                    } else {
+                        resultsMsg.textContent = `${tootCount} toot(s) extracted...`;
+                    }
                     if (lang && sLang === lang) {
                         tootCount++;
                     } else if (!lang) {
                         tootCount++;
                     }
-                    console.log(
-                        'Toots extracted: ' + tootCount + '/' + maxToots
-                    );
-                    if (maxToots && maxToots !== Infinity) {
-                        resultsMsg.textContent = `Extracting ${tootCount} toot(s) out of ${maxToots}...`;
-                    } else {
-                        resultsMsg.textContent = `Extracting ${tootCount} toot(s)`;
-                    }
-                    if (tootCount >= maxToots) {
+                    // if (maxToots && maxToots !== Infinity) {
+                    //     resultsMsg.textContent = `Extracting ${tootCount} toot(s) out of ${maxToots}...`;
+                    // } else {
+                    //     resultsMsg.textContent = `Extracting ${tootCount} toot(s)`;
+                    // }
+                    if (tootCount > maxToots) {
                         return;
                     }
                 }
