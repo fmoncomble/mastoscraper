@@ -1,3 +1,5 @@
+![mastologo](https://github.com/fmoncomble/mastoscraper/assets/59739627/15c77ec3-9dba-4e97-868f-984dddd87816)
+
 [(English version)](https://fmoncomble.github.io/mastoscraper)
 
 Une extension pour extraire et télécharger des pouets (posts sur Mastodon) à des fins de fouille textuelle.  
