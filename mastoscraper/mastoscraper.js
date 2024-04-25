@@ -479,8 +479,9 @@ document.addEventListener('DOMContentLoaded', async function () {
             }
             queryUrl = queryUrl + 'account_id=' + account;
         }
-        queryUrl = queryUrl + '&type=statuses&resolve=true&limit=20';
+        queryUrl = queryUrl + '&type=statuses&resolve=true&limit=40';
         queryUrl = encodeURI(queryUrl);
+        console.log('Query URL = ', queryUrl);
 
         // Fetch query response from server
         try {

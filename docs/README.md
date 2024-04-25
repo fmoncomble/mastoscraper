@@ -8,7 +8,7 @@ An extension for extracting and downloading toots (posts on Mastodon) for text m
 ### Cite this program
 If you use this extension for your research, please reference it as follows:  
   
-Moncomble, F. (2024). *MastoScraper* (Version 0.3) [JavaScript]. Arras, France: Université d'Artois. Available at: https://fmoncomble.github.io/mastoscraper/
+Moncomble, F. (2024). *MastoScraper* (Version 0.2) [JavaScript]. Arras, France: Université d'Artois. Available at: https://fmoncomble.github.io/mastoscraper/
 
 
 ## Installation
