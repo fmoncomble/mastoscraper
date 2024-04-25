@@ -34,6 +34,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     const accountInput = document.getElementById('account');
     const searchBtn = document.getElementById('search-btn');
     const searchMsg = document.getElementById('search-msg');
+    const noResult = document.getElementById('no-result');
     const extractContainer = document.getElementById('extract-container');
     const formatSelect = document.getElementById('output-format');
     const maxTootsInput = document.getElementById('max-toots');
@@ -482,7 +483,7 @@ document.addEventListener('DOMContentLoaded', async function () {
             }
             queryUrl = queryUrl + 'account_id=' + account;
         }
-        queryUrl = queryUrl + '&type=statuses&resolve=true&limit=40';
+        queryUrl = queryUrl + '&type=statuses&resolve=true';
         queryUrl = encodeURI(queryUrl);
         console.log('Query URL = ', queryUrl);
 
@@ -522,13 +523,19 @@ document.addEventListener('DOMContentLoaded', async function () {
                 searchMsg.style.display = 'none';
                 throw new Error('Could not fetch search results.');
             }
-            // const data = await response.json();
-            searchMsg.style.display = 'none';
-            searchContainer.style.display = 'none';
-            searchFold.style.display = 'none';
-            searchUnfold.style.display = 'block';
-            extractContainer.style.display = 'block';
-            extractBtn.style.display = 'block';
+            const searchData = await response.json();
+            const searchResults = searchData.statuses;
+            if (searchResults.length == 0) {
+                searchMsg.style.display = 'none';
+                noResult.style.display = 'block';
+            } else {
+                searchMsg.style.display = 'none';
+                searchContainer.style.display = 'none';
+                searchFold.style.display = 'none';
+                searchUnfold.style.display = 'block';
+                extractContainer.style.display = 'block';
+                extractBtn.style.display = 'block';
+            }
         } catch (error) {
             console.error(error);
         }
@@ -538,6 +545,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     searchBtn.addEventListener('click', () => {
         extractContainer.style.display = 'none';
         searchMsg.style.display = 'block';
+        noResult.style.display = 'none';
         buildQueryUrl();
     });
 
@@ -646,8 +654,12 @@ document.addEventListener('DOMContentLoaded', async function () {
                 if (p === 1) {
                     nextQueryUrl = queryUrl;
                 } else if (p > 1) {
-                    maxId = BigInt(id) - BigInt(1);
-                    nextQueryUrl = queryUrl + '&max_id=' + maxId.toString();
+                    nextQueryUrl = queryUrl + '&max_id=' + id.toString();
+                }
+                if (maxToots !== Infinity) {
+                    nextQueryUrl = nextQueryUrl + '&limit=' + maxToots;
+                } else {
+                    nextQueryUrl = nextQueryUrl + '&limit=40';
                 }
                 console.log('Extracting query URL = ', nextQueryUrl);
                 const response = await fetch(nextQueryUrl, {
@@ -671,7 +683,14 @@ document.addEventListener('DOMContentLoaded', async function () {
                 }
                 const data = await response.json();
                 statuses = data.statuses;
-                if (statuses.length == 0) {
+                console.log(
+                    'Number of statuses in next batch: ',
+                    statuses.length
+                );
+                if (
+                    statuses.length == 0 ||
+                    (tootCount > 1 && statuses.length <= 1)
+                ) {
                     abort = true;
                 }
                 for (s of statuses) {
@@ -680,13 +699,14 @@ document.addEventListener('DOMContentLoaded', async function () {
                     if (tootSet.has(id)) {
                         continue;
                     }
-                    tootSet.add(id);
-                    username = s.account.acct;
-                    date = s.created_at.split('T')[0];
                     let sLang = s.language;
                     if (lang && sLang !== lang) {
                         continue;
                     }
+                    tootSet.add(id);
+                    console.log('Toots collected so far: ', tootSet);
+                    username = s.account.acct;
+                    date = s.created_at.split('T')[0];
                     let rawText = s.content;
                     let rawTextHtml = parser.parseFromString(
                         rawText,
@@ -738,7 +758,9 @@ ${text}
                         csvData.push({ username, date, text });
                     }
                     if (maxToots !== Infinity) {
-                        let tootPercent = Math.round((tootCount / maxToots) * 100);
+                        let tootPercent = Math.round(
+                            (tootCount / maxToots) * 100
+                        );
                         resultsMsg.textContent = `${tootPercent}% extracted...`;
                     } else {
                         resultsMsg.textContent = `${tootCount} toot(s) extracted...`;
