@@ -694,6 +694,7 @@ document.addEventListener('DOMContentLoaded', async function () {
                     abort = true;
                 }
                 for (s of statuses) {
+                    console.log('Status being processed: ', s);
                     const parser = new DOMParser();
                     id = s.id;
                     if (tootSet.has(id)) {
@@ -704,7 +705,6 @@ document.addEventListener('DOMContentLoaded', async function () {
                         continue;
                     }
                     tootSet.add(id);
-                    console.log('Toots collected so far: ', tootSet);
                     username = s.account.acct;
                     date = s.created_at.split('T')[0];
                     let rawText = s.content;
@@ -712,16 +712,12 @@ document.addEventListener('DOMContentLoaded', async function () {
                         rawText,
                         'text/html'
                     );
-                    const links = rawTextHtml.body.querySelectorAll('a');
-                    if (links) {
-                        for (l of links) {
-                            l.parentNode.removeChild(l);
-                        }
-                    }
-                    text = rawTextHtml.body.textContent.replaceAll(
-                        /([\.,:;?!])(?!\p{Z})/gu,
-                        '$1 '
-                    );
+                    let rawTextString = rawTextHtml.documentElement.innerHTML;
+                    rawTextString = rawTextString
+                        .replaceAll('<br>', '\n')
+                        .replaceAll('<p>', '\n')
+                        .replaceAll(/<.+?>/gu, '');
+                    text = rawTextString.normalize('NFC');
                     url = s.url;
 
                     if (fileFormat === 'xml') {
@@ -732,11 +728,24 @@ document.addEventListener('DOMContentLoaded', async function () {
                             .replaceAll('"', '&quot;')
                             .replaceAll("'", '&apos;');
                         text = text
-                            .replaceAll('&', '&amp;')
                             .replaceAll('<', '&lt;')
                             .replaceAll('>', '&gt;')
                             .replaceAll('"', '&quot;')
-                            .replaceAll("'", '&apos;');
+                            .replaceAll("'", '&apos;')
+                            .replaceAll('&nbsp;', ' ');
+                        const urlRegex =
+                            /(?:https?|ftp):\/\/[-A-Za-z0-9+&@#\/%?=~_|!:,.;]*[-A-Za-z0-9+&@#\/%=~_|]/;
+                        const links = text.match(urlRegex);
+                        if (links) {
+                            for (l of links) {
+                                const newLink = l.replace(
+                                    /(.+)/,
+                                    `<ref target="$1">$1</ref>`
+                                );
+                                text = text.replace(l, newLink);
+                            }
+                        }
+                        text = text.replaceAll('\n', ' ');
                         file =
                             file +
                             `<lb></lb><lb></lb>
