@@ -6,6 +6,7 @@ html {
 
 body {
     margin-left: 10%;
+    color: #17063B;
     background-color: white;
     text-align: center;
     font-family: 'mastodon-font-sans-serif', system-ui, sans-serif;
@@ -20,27 +21,27 @@ div#version-div {
 }
 
 span#instructions {
-    color: #563accff;
+    color: #2F0C7A;
     font-weight: bold;
     text-decoration: underline;
     cursor: pointer;
 }
 
 span#instructions:hover {
-    color: #9785e0;
+    color: #563ACC;
 }
 
 div#instructions-container {
-    background-color: #eeebfa;
-    color: #563accff;
-    padding: 4px; 
+    background-color: #e7e8fe;
+    color: #2F0C7A;
+    padding: 5px; 
     margin: 5px;
 }
 
 button.masto-scraper,
 select.masto-scraper {
-    color: #563accff;
-    border: solid 1px #563accff;
+    color: #2F0C7A;
+    border: solid 1px #2F0C7A;
     background-color: white;
     height: 32px;
     width: 100px;
@@ -61,6 +62,18 @@ button#abort-btn:hover {
     background-color: #ffe6e6;
 }
 
+button#reset-auth {
+    width: auto;
+    color: #ff0000;
+    border-color: #ff0000;
+    margin: 5px;
+}
+
+button#reset-auth:hover {
+    border-color: #ff8080;
+    background-color: #ffe6e6;
+}
+
 button#extract-btn,
 button#abort-btn,
 button#dl-btn,
@@ -76,12 +89,12 @@ button#dl-btn {
 
 button.masto-scraper:hover,
 select.masto-scraper:hover {
-    background-color: #eeebfa;
+    background-color: #e7e8fe;
 }
 
 .masto-spinner {
-  border: 2px solid #eeebfa;
-  border-left: 2px solid #563accff;
+  border: 2px solid #e7e8fe;
+  border-left: 2px solid #2F0C7A;
   border-radius: 50%;
   width: 12px;
   height: 12px;
@@ -103,7 +116,7 @@ div.fold {
     padding-left: 1em;
     padding-right: 1em;
     height: 2em;
-    background-color: #eeebfa;
+    background-color: #e7e8fe;
     border-radius: 4px;
     cursor: pointer;
     font-weight: bold;
@@ -128,7 +141,7 @@ div#search-unfold::after {
 }
 
 div#auth-container {
-    border: 1px solid #563accff;
+    border: 1px solid #2F0C7A;
     border-radius: 4px;
     margin: 1em auto 1em;
     padding: 1em;
@@ -137,6 +150,7 @@ div#auth-container {
 
 div#all-done {
     color: #006600;
+    font-weight: bold;
 }
 
 label {
@@ -149,12 +163,12 @@ input.masto-scraper {
     padding-left: 5px;
     border-radius: 4px;
     margin: 5px;
-    border: solid 1px #563accff;
+    border: solid 1px #2F0C7A;
     display: inline-block;
 }
 
 input.masto-scraper:focus-visible {
-    outline: solid 2px #563accff;
+    outline: solid 2px #2F0C7A;
 }
 
 input#token-input {
@@ -163,4 +177,30 @@ input#token-input {
 
 input#max-toots {
     width: 50px;
+}
+
+div#notice {
+    width: 512px;
+    color: #E66300;
+    border: 2px solid #E66300;
+    border-radius: 4px;
+    background-color: #FFF099;
+    padding: 5px;
+    display: block;
+    position: absolute;
+    bottom: 5%;
+}
+
+a {
+    color: #17063B;
+    font-weight: bold;
+}
+
+a:hover {
+    color: #2F0C7A
+}
+
+a.notice {
+    color: inherit;
+    font-weight: bold;
 }

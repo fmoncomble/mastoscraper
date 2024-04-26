@@ -14,7 +14,7 @@
                 width="300"
                 fill="currentColor"
             />
-            <div id="version-div">v0.2.7</div>
+            <div id="version-div">v0.3</div>
         </div>
         <br />
         <!-- Authentication container -->
@@ -28,13 +28,13 @@
             <span id="instructions">Show instructions</span>
             <br />
             <div id="instructions-container" style="display: none">
-                On the first use, you will have to create an application in your
-                Mastodon's account developer settings. <br /><br />
-                Name it MastoScraper, do not change any settings and click the
+                <p>On first use, you will have to create an application in your
+                Mastodon's account developer settings.</p>
+                <p>Name it MastoScraper, do not change any settings and click the
                 "Submit" button at the bottom of the page. You will need the
-                application ID and secret. <br /><br />
-                Follow the steps below to complete authorization.<br><br>
-                <strong>⚠️ Allow pop-ups when prompted.</strong>
+                application ID and secret.</p>
+                <p>Follow the steps below to complete authorization.</p>
+                <p><strong>⚠️ Allow pop-ups when prompted.</strong></p>
             </div>
             <br />
             <div id="instance-container">
@@ -101,7 +101,8 @@
                 <button id="token-save" class="masto-scraper">Save</button>
             </div>
             <div id="all-done" style="display: none">
-                Authorization complete
+                <div>Authorization complete</div>
+                <button id="reset-auth" class="masto-scraper">Reset</button>
             </div>
             <!-- Invisible authentication query forms -->
             <form id="auth-form-1" method="GET" action="">
@@ -218,6 +219,15 @@
             </div>
             <div>
                 <input
+                    id="search-instance"
+                    class="masto-scraper"
+                    name="search-instance"
+                    type="text"
+                    placeholder="From these instances (separated by commas)"
+                />
+            </div>
+            <div>
+                <input
                     id="account"
                     class="masto-scraper"
                     name="account"
@@ -225,8 +235,8 @@
                     placeholder="From this account (username@instance)"
                 />
             </div>
-            <!-- <div>
-                <label for="from-date">From: </label>
+            <div>
+                <label for="from-date">From date (inclusive): </label>
                 <input
                     id="from-date"
                     class="masto-scraper"
@@ -236,7 +246,7 @@
                 />
             </div>
             <div>
-                <label for="to-date">To: </label>
+                <label for="to-date">Before date (exclusive): </label>
                 <input
                     id="to-date"
                     class="masto-scraper"
@@ -244,7 +254,7 @@
                     type="date"
                     placeholder="To date"
                 />
-            </div> -->
+            </div>
             <br />
             <button id="search-btn" class="masto-scraper">Search</button>
             <div id="search-msg" style="display: none">
@@ -255,7 +265,9 @@
                 ></div>
                 Searching...
             </div>
-            <div id="no-result" style="display: none">Search returned no result</div>
+            <div id="no-result" style="display: none">
+                Search returned no result
+            </div>
         </div>
         <!-- Extraction container -->
         <div id="extract-container" style="display: none">
@@ -324,6 +336,11 @@
                 </button>
                 <div id="dl-result"></div>
             </div>
+        </div>
+        <div id="notice">
+            <p><b>Important notice</b></p>
+            <p>Mastodon, which forms part of the fediverse, is unlike most other social networks. Please reflect on the <b>ethics</b> of your planned use of the data you are scraping, and consider studying the <b>terms and conditions</b> of the various instances you are drawing data from.</p>
+            <p><a class="notice" href="https://www.cell.com/patterns/pdf/S2666-3899(23)00323-9.pdf" target="_blank">Here</a> is some relevant reading, courtesy of <a class="notice" href="https://fediscience.org/@UlrikeHahn" target="_blank">Ulrike Hahn</a>.</p>
         </div>
     </body>
 </html>

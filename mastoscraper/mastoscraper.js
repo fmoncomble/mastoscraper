@@ -21,17 +21,21 @@ document.addEventListener('DOMContentLoaded', async function () {
     const tokenInput = document.getElementById('token-input');
     const tokenSaveBtn = document.getElementById('token-save');
     const allDone = document.getElementById('all-done');
+    const authBtnContainer = document.getElementById('auth-btn-container');
+    const authBtn = document.getElementById('auth-btn');
+    const resetAuthBtn = document.getElementById('reset-auth');
     const searchFold = document.getElementById('search-fold');
     const searchUnfold = document.getElementById('search-unfold');
     const searchContainer = document.getElementById('search-container');
-    const authBtnContainer = document.getElementById('auth-btn-container');
-    const authBtn = document.getElementById('auth-btn');
     const allWordsInput = document.getElementById('all-words');
     const thisPhraseInput = document.getElementById('this-phrase');
     // const anyWordInput = document.getElementById('any-word');
     // const noWordInput = document.getElementById('no-word');
     const langInput = document.getElementById('lang');
     const accountInput = document.getElementById('account');
+    const searchInstanceInput = document.getElementById('search-instance');
+    const fromDateInput = document.getElementById('from-date');
+    const toDateInput = document.getElementById('to-date');
     const searchBtn = document.getElementById('search-btn');
     const searchMsg = document.getElementById('search-msg');
     const noResult = document.getElementById('no-result');
@@ -249,6 +253,35 @@ document.addEventListener('DOMContentLoaded', async function () {
         } else {
             allDone.style.display = 'none';
         }
+    });
+
+    // Reset authentication button
+    resetAuthBtn.addEventListener('click', () => {
+        saveCredential(
+            instanceInput,
+            mastoCred,
+            instanceSaveBtn,
+            instancePlaceholder
+        );
+        saveCredential(idInput, idCred, idSaveBtn, idPlaceholder);
+        saveCredential(
+            secretInput,
+            secretCred,
+            secretSaveBtn,
+            secretPlaceholder
+        );
+        saveCredential(codeInput, codeCred, codeSaveBtn, codePlaceholder);
+        saveCredential(
+            tokenInput,
+            tokenCred,
+            tokenSaveBtn,
+            tokenPlaceholder
+        );
+        getCodeBtn.style.display = 'none';
+        codeContainer.style.display = 'none';
+        authBtnContainer.style.display = 'none';
+        tokenContainer.style.display = 'none';
+        allDone.style.display = 'none';
     });
 
     // Functions to check for credentials
@@ -565,6 +598,28 @@ document.addEventListener('DOMContentLoaded', async function () {
         dlBtn.textContent = 'Download ' + fileFormat.toUpperCase();
     });
 
+    let fromDate;
+    fromDateInput.addEventListener('change', () => {
+        fromDate = fromDateInput.value;
+        console.log('From date: ', fromDate);
+    });
+
+    let toDate;
+    toDateInput.addEventListener('change', () => {
+        toDate = toDateInput.value;
+        console.log('To date: ', toDate);
+    });
+
+    let searchInstances;
+    searchInstanceInput.addEventListener('change', () => {
+        searchInstanceInput.value = searchInstanceInput.value.replaceAll(
+            ' ',
+            ''
+        );
+        searchInstances = searchInstanceInput.value.split(',');
+        console.log('Search instances = ', searchInstances);
+    });
+
     let file;
     let statuses;
     let id;
@@ -604,7 +659,6 @@ document.addEventListener('DOMContentLoaded', async function () {
         abortBtn.textContent = 'Aborting...';
         abort = true;
     });
-
     // Function to scrape toots
     async function scrape() {
         let tootSet = new Set();
@@ -656,11 +710,7 @@ document.addEventListener('DOMContentLoaded', async function () {
                 } else if (p > 1) {
                     nextQueryUrl = queryUrl + '&max_id=' + id.toString();
                 }
-                if (maxToots !== Infinity) {
-                    nextQueryUrl = nextQueryUrl + '&limit=' + maxToots;
-                } else {
-                    nextQueryUrl = nextQueryUrl + '&limit=40';
-                }
+                nextQueryUrl = nextQueryUrl + '&limit=40';
                 console.log('Extracting query URL = ', nextQueryUrl);
                 const response = await fetch(nextQueryUrl, {
                     headers: {
@@ -705,8 +755,36 @@ document.addEventListener('DOMContentLoaded', async function () {
                         continue;
                     }
                     tootSet.add(id);
+
                     username = s.account.acct;
-                    date = s.created_at.split('T')[0];
+
+                    date = s.created_at;
+                    console.log('Toot date = ', date);
+                    if (fromDate && date < fromDate) {
+                        console.log('From date = ', fromDate);
+                        console.log(
+                            date < fromDate,
+                            'Too old: stopping scrape'
+                        );
+                        abort = true;
+                        break;
+                    }
+                    if (toDate && date > toDate) {
+                        console.log('To date = ', toDate);
+                        console.log(date > toDate, 'Too recent: skipping toot');
+                        continue;
+                    }
+
+                    let sInstance = username.split('@')[1];
+                    if (searchInstances && searchInstances.length > 0) {
+                        if (!searchInstances.includes(sInstance)) {
+                            console.log(
+                                'Not from list of search instances: skipping toot'
+                            );
+                            continue;
+                        }
+                    }
+                    date = date.split('T')[0];
                     let rawText = s.content;
                     let rawTextHtml = parser.parseFromString(
                         rawText,
@@ -717,7 +795,9 @@ document.addEventListener('DOMContentLoaded', async function () {
                         .replaceAll('<br>', '\n')
                         .replaceAll('<p>', '\n')
                         .replaceAll(/<.+?>/gu, '');
+                    console.log('Text before normalization: ', rawTextString);
                     text = rawTextString.normalize('NFC');
+                    console.log('Normalized text: ', text);
                     url = s.url;
 
                     if (fileFormat === 'xml') {
