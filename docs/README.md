@@ -39,3 +39,6 @@ While the add-on is being authorized on the Chrome WebStore, you can test it by 
 - (Optional) Enter the maximum number of toots to collect.
 - You can stop the process at any time by clicking `Abort`.
 - Click `Download` to collect the output or `Reset` to start afresh.
+
+## Known limitations
+Searching by instance and date is not built into the Mastodon API: results are filtered from the query response, which may take some time depending on the chosen criteria.

@@ -37,3 +37,6 @@ En attendant la disponibilité sur le Chrome WebStore, vous pouvez tester l'exte
 - (Facultatif) Entrez un nombre maximum de pouets à récupérer.
 - Vous pouvez arrêter l'extraction à tout moment en cliquant sur `Abort`.
 - Cliquez sur `Download` pour collecter le résultat, ou `Reset` pour reprendre au début.
+
+## Limites connues
+La recherche par instance et par dates ne fait pas partie de l'API Mastodon : les résultats sont obtenus par sélection au sein des réponses à la requête, ce qui peut prendre plus ou moins de temps en fonction des critères retenus.
