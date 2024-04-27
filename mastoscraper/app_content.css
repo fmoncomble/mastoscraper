@@ -1,0 +1,17 @@
+button.masto-scraper {
+    background-color: #6364FF;
+    color: white;
+    font-weight: bold;
+    font-family: "mastodon-font-sans-serif", system-ui, sans-serif;
+    line-height: 18px;
+    padding: 8px;
+    border: none;
+    border-radius: 4px;
+    width: 70px;
+    transition: background-color 0.4s;
+    float: right;
+}
+
+button.masto-scraper:hover {
+    background-color: #563ACC;
+}

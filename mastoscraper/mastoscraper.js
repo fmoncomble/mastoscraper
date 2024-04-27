@@ -17,9 +17,6 @@ document.addEventListener('DOMContentLoaded', async function () {
     const codeContainer = document.getElementById('code-container');
     const codeInput = document.getElementById('code-input');
     const codeSaveBtn = document.getElementById('code-save');
-    const tokenContainer = document.getElementById('token-container');
-    const tokenInput = document.getElementById('token-input');
-    const tokenSaveBtn = document.getElementById('token-save');
     const allDone = document.getElementById('all-done');
     const authBtnContainer = document.getElementById('auth-btn-container');
     const authBtn = document.getElementById('auth-btn');
@@ -29,8 +26,6 @@ document.addEventListener('DOMContentLoaded', async function () {
     const searchContainer = document.getElementById('search-container');
     const allWordsInput = document.getElementById('all-words');
     const thisPhraseInput = document.getElementById('this-phrase');
-    // const anyWordInput = document.getElementById('any-word');
-    // const noWordInput = document.getElementById('no-word');
     const langInput = document.getElementById('lang');
     const accountInput = document.getElementById('account');
     const searchInstanceInput = document.getElementById('search-instance');
@@ -141,13 +136,11 @@ document.addEventListener('DOMContentLoaded', async function () {
     let idCred = 'masto_client_id';
     let secretCred = 'masto_client_secret';
     let codeCred = 'masto_client_code';
-    let tokenCred = 'mastousertoken';
 
     let instancePlaceholder = 'Enter your Mastodon instance (example.instance)';
     let idPlaceholder = 'Enter your app client ID';
     let secretPlaceholder = 'Enter your app client secret';
     let codePlaceholder = 'Enter your code';
-    let tokenPlaceholder = 'Enter your user token';
 
     let mastoDevUrl;
 
@@ -167,6 +160,7 @@ document.addEventListener('DOMContentLoaded', async function () {
                     url: mastoDevUrl,
                 });
                 devTab;
+                idInput.focus();
             }
         }
     });
@@ -184,6 +178,7 @@ document.addEventListener('DOMContentLoaded', async function () {
                 url: mastoDevUrl,
             });
             devTab;
+            idInput.focus();
         }
     });
 
@@ -191,10 +186,12 @@ document.addEventListener('DOMContentLoaded', async function () {
     idInput.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
             saveCredential(idInput, idCred, idSaveBtn, idPlaceholder);
+            secretInput.focus();
         }
     });
     idSaveBtn.addEventListener('click', () => {
         saveCredential(idInput, idCred, idSaveBtn, idPlaceholder);
+        secretInput.focus();
     });
 
     // Store app secret
@@ -236,68 +233,6 @@ document.addEventListener('DOMContentLoaded', async function () {
         authBtnContainer.style.display = 'block';
     }
 
-    // Store user token
-
-    if (!userToken) {
-        authContainer.style.display = 'block';
-        authFold.style.display = 'block';
-        authUnfold.style.display = 'none';
-        searchContainer.style.display = 'none';
-        searchFold.style.display = 'none';
-        searchUnfold.style.display = 'block';
-        authBtnContainer.style.display = 'none';
-        getCodeBtn.style.display = 'none';
-    } else {
-        codeContainer.style.display = 'block';
-        getCodeBtn.style.display = 'block';
-        authBtnContainer.style.display = 'block';
-        tokenContainer.style.display = 'block';
-        allDone.style.display = 'block';
-        searchContainer.style.display = 'block';
-        searchFold.style.display = 'block';
-        searchUnfold.style.display = 'none';
-    }
-
-    tokenInput.addEventListener('keydown', async (e) => {
-        if (e.key === 'Enter') {
-            saveCredential(
-                tokenInput,
-                tokenCred,
-                tokenSaveBtn,
-                tokenPlaceholder
-            );
-            userToken = await retrieveCredential('mastousertoken');
-            if (userToken) {
-                allDone.style.display = 'block';
-                setTimeout(() => {
-                    authContainer.style.display = 'none';
-                    authFold.style.display = 'none';
-                    authUnfold.style.display = 'block';
-                    searchContainer.style.display = 'block';
-                    searchFold.style.display = 'block';
-                    searchUnfold.style.display = 'none';
-                }, 1000);
-            }
-        }
-    });
-    tokenSaveBtn.addEventListener('click', async function () {
-        saveCredential(tokenInput, tokenCred, tokenSaveBtn, tokenPlaceholder);
-        userToken = await retrieveCredential('mastousertoken');
-        if (userToken) {
-            allDone.style.display = 'block';
-            setTimeout(() => {
-                authContainer.style.display = 'none';
-                authFold.style.display = 'none';
-                authUnfold.style.display = 'block';
-                searchContainer.style.display = 'block';
-                searchFold.style.display = 'block';
-                searchUnfold.style.display = 'none';
-            }, 1000);
-        } else {
-            allDone.style.display = 'none';
-        }
-    });
-
     // Reset authentication button
     resetAuthBtn.addEventListener('click', () => {
         saveCredential(
@@ -314,12 +249,11 @@ document.addEventListener('DOMContentLoaded', async function () {
             secretPlaceholder
         );
         saveCredential(codeInput, codeCred, codeSaveBtn, codePlaceholder);
-        saveCredential(tokenInput, tokenCred, tokenSaveBtn, tokenPlaceholder);
+        removeUserToken();
         removeUnderstand();
         getCodeBtn.style.display = 'none';
         codeContainer.style.display = 'none';
         authBtnContainer.style.display = 'none';
-        tokenContainer.style.display = 'none';
         allDone.style.display = 'none';
         searchContainer.style.display = 'none';
         location.reload();
@@ -366,12 +300,64 @@ document.addEventListener('DOMContentLoaded', async function () {
         codeSaveBtn,
         codePlaceholder
     );
-    handleCredential(
-        'mastousertoken',
-        tokenInput,
-        tokenSaveBtn,
-        tokenPlaceholder
-    );
+
+    //Functions to handle user token
+    getUserToken(function (userTokenResult) {
+        userToken = userTokenResult;
+
+        if (userToken) {
+            codeContainer.style.display = 'block';
+            getCodeBtn.style.display = 'block';
+            authBtnContainer.style.display = 'block';
+            allDone.style.display = 'block';
+            searchContainer.style.display = 'block';
+            searchFold.style.display = 'block';
+            searchUnfold.style.display = 'none';
+        } else {
+            authContainer.style.display = 'block';
+            authFold.style.display = 'block';
+            authUnfold.style.display = 'none';
+            searchContainer.style.display = 'none';
+            searchFold.style.display = 'none';
+            searchUnfold.style.display = 'block';
+            authBtnContainer.style.display = 'none';
+            getCodeBtn.style.display = 'none';
+        }
+    });
+
+    function getUserToken(callback) {
+        chrome.storage.local.get(['mastousertoken'], function (result) {
+            const mastousertoken = result.mastousertoken || '';
+            if (mastousertoken) {
+                console.log('User token?', mastousertoken);
+            } else {
+                console.log('User token not set');
+            }
+            callback(mastousertoken);
+        });
+    }
+
+    async function saveUserToken() {
+        chrome.storage.local.set({ mastousertoken: userToken }, function () {
+            console.log('User token stored: ', userToken);
+            allDone.style.display = 'block';
+            setTimeout(() => {
+                authContainer.style.display = 'none';
+                authFold.style.display = 'none';
+                authUnfold.style.display = 'block';
+                searchContainer.style.display = 'block';
+                searchFold.style.display = 'block';
+                searchUnfold.style.display = 'none';
+            }, 1000);
+        });
+    }
+
+    async function removeUserToken() {
+        chrome.storage.local.remove('mastousertoken', function () {
+            userToken = '';
+            console.log('User token reset');
+        });
+    }
 
     // Function to store credentials
     async function saveCredential(input, credType, button, placeholder) {
@@ -443,6 +429,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     getCodeBtn.addEventListener('click', () => {
         getCode();
         codeContainer.style.display = 'block';
+        codeInput.focus();
     });
 
     // Function to obtain user token
@@ -480,12 +467,37 @@ document.addEventListener('DOMContentLoaded', async function () {
         secretAuthInput.setAttribute('value', clientSecret.trim());
         uriInput.setAttribute('value', 'urn:ietf:wg:oauth:2.0:oob');
 
-        form.submit();
+        const formData = new FormData(form);
+        const url = 'https://' + mastoInstance + '/oauth/token';
+
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                body: formData,
+            });
+
+            if (!response.ok) {
+                window.alert('There was an error during authorization');
+                throw new Error('Network response was not ok');
+            }
+
+            const jsonData = await response.json();
+            console.log(jsonData);
+            accessToken = jsonData.access_token;
+            if (accessToken) {
+                userToken = accessToken;
+                saveUserToken();
+            } else {
+                window.alert('Could not retrieve access token');
+                throw new Error('Could not retrieve access token');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
     }
 
     authBtn.addEventListener('click', async () => {
         authorize();
-        tokenContainer.style.display = 'block';
     });
 
     // Function to retrieve credential from storage
@@ -512,8 +524,6 @@ document.addEventListener('DOMContentLoaded', async function () {
         // Concatenate query URL from search elements
         let allWords = allWordsInput.value.replaceAll(' ', ' AND ');
         let thisPhrase = thisPhraseInput.value;
-        // let anyWord = anyWordInput.value.replaceAll(' ', ' OR ');
-        // let noWord = noWordInput.value.replaceAll(' ', ' NOT ');
         lang = langInput.value;
         let account = accountInput.value.replaceAll(' ', ' AND ');
         if (allWords || thisPhrase || anyWord || noWord) {
@@ -528,18 +538,6 @@ document.addEventListener('DOMContentLoaded', async function () {
             }
             queryUrl = queryUrl + '"' + thisPhrase + '"';
         }
-        // if (anyWord) {
-        //     if (allWords || thisPhrase) {
-        //         queryUrl = queryUrl + ' AND ';
-        //     }
-        //     queryUrl = queryUrl + anyWord;
-        // }
-        // if (noWord) {
-        //     if (allWords || thisPhrase || anyWord) {
-        //         queryUrl = queryUrl + ' NOT ';
-        //     }
-        //     queryUrl = queryUrl + noWord;
-        // }
         if (account) {
             getIdUrl =
                 'https://' +
