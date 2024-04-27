@@ -5,5 +5,6 @@ document.addEventListener('DOMContentLoaded', function () {
         const mastoscraperUrl = encodeURIComponent('mastoscraper.html');
         const url = chrome.runtime.getURL(mastoscraperUrl);
         chrome.tabs.create({ url: url });
+        window.close();
     });
 });

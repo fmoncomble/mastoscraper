@@ -14,7 +14,7 @@
                 width="300"
                 fill="currentColor"
             />
-            <div id="version-div">v0.3</div>
+            <div id="version-div">v0.3.1</div>
         </div>
         <br />
         <!-- Authentication container -->
@@ -28,11 +28,15 @@
             <span id="instructions">Show instructions</span>
             <br />
             <div id="instructions-container" style="display: none">
-                <p>On first use, you will have to create an application in your
-                Mastodon's account developer settings.</p>
-                <p>Name it MastoScraper, do not change any settings and click the
-                "Submit" button at the bottom of the page. You will need the
-                application ID and secret.</p>
+                <p>
+                    On first use, you will have to create an application in your
+                    Mastodon's account developer settings.
+                </p>
+                <p>
+                    Name it MastoScraper, do not change any settings and click
+                    the "Submit" button at the bottom of the page. You will need
+                    the application ID and secret.
+                </p>
                 <p>Follow the steps below to complete authorization.</p>
                 <p><strong>⚠️ Allow pop-ups when prompted.</strong></p>
             </div>
@@ -337,10 +341,25 @@
                 <div id="dl-result"></div>
             </div>
         </div>
-        <div id="notice">
+        <div id="notice" style="display: none">
             <p><b>Important notice</b></p>
-            <p>Mastodon, which forms part of the fediverse, is unlike most other social networks. Please reflect on the <b>ethics</b> of your planned use of the data you are scraping, and consider studying the <b>terms and conditions</b> of the various instances you are drawing data from.</p>
-            <p><a class="notice" href="https://www.cell.com/patterns/pdf/S2666-3899(23)00323-9.pdf" target="_blank">Here</a> is some relevant reading.</p>
+            <p>
+                Mastodon, which forms part of the fediverse, is unlike most
+                other social networks. Please reflect on the <b>ethics</b> of
+                your planned use of the data you are scraping, and consider
+                studying the <b>terms and conditions</b> of the various
+                instances you are drawing data from.
+            </p>
+            <p>
+                <a
+                    class="notice"
+                    href="https://www.cell.com/patterns/pdf/S2666-3899(23)00323-9.pdf"
+                    target="_blank"
+                    >Here</a
+                >
+                is some relevant reading.
+            </p>
+            <p id="dismiss">I understand</p>
         </div>
     </body>
 </html>

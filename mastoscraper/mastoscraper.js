@@ -49,6 +49,50 @@ document.addEventListener('DOMContentLoaded', async function () {
     const resultsMsg = document.getElementById('results-msg');
     const dlBtn = document.getElementById('dl-btn');
     const resetBtn = document.getElementById('reset-btn');
+    const notice = document.getElementById('notice');
+    const dismissBtn = document.getElementById('dismiss');
+
+    // Manage notice
+    let understand;
+    let userToken;
+    userToken = await retrieveCredential('mastousertoken');
+
+    getUnderstand(function (understandResult) {
+        console.log('Retrieving notice understand');
+        understand = understandResult;
+        if (userToken && understand) {
+            notice.style.display = 'none';
+            console.log('Notice understood');
+        } else {
+            console.log('Notice not understood');
+            notice.style.display = 'block';
+        }
+    });
+
+    function getUnderstand(callback) {
+        chrome.storage.local.get(['understand'], function (result) {
+            const understand = result.understand || '';
+            console.log('Notice understood?', understand);
+            callback(understand);
+        });
+    }
+
+    async function saveUnderstand() {
+        chrome.storage.local.set({ understand: 'understand' }, function () {
+            console.log('Notice understood and dismissed');
+            notice.style.display = 'none';
+        });
+    }
+
+    async function removeUnderstand() {
+        chrome.storage.local.remove('understand', function () {
+            notice.style.display = 'block';
+        });
+    }
+
+    dismissBtn.addEventListener('click', () => {
+        saveUnderstand();
+    });
 
     // Assign role to Authentication header
     authFold.addEventListener('click', () => {
@@ -193,7 +237,6 @@ document.addEventListener('DOMContentLoaded', async function () {
     }
 
     // Store user token
-    let userToken = await retrieveCredential('mastousertoken');
 
     if (!userToken) {
         authContainer.style.display = 'block';
@@ -203,7 +246,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         searchFold.style.display = 'none';
         searchUnfold.style.display = 'block';
         authBtnContainer.style.display = 'none';
-        getCodeBtn.style.display = 'block';
+        getCodeBtn.style.display = 'none';
     } else {
         codeContainer.style.display = 'block';
         getCodeBtn.style.display = 'block';
@@ -271,17 +314,15 @@ document.addEventListener('DOMContentLoaded', async function () {
             secretPlaceholder
         );
         saveCredential(codeInput, codeCred, codeSaveBtn, codePlaceholder);
-        saveCredential(
-            tokenInput,
-            tokenCred,
-            tokenSaveBtn,
-            tokenPlaceholder
-        );
+        saveCredential(tokenInput, tokenCred, tokenSaveBtn, tokenPlaceholder);
+        removeUnderstand();
         getCodeBtn.style.display = 'none';
         codeContainer.style.display = 'none';
         authBtnContainer.style.display = 'none';
         tokenContainer.style.display = 'none';
         allDone.style.display = 'none';
+        searchContainer.style.display = 'none';
+        location.reload();
     });
 
     // Functions to check for credentials
@@ -402,7 +443,6 @@ document.addEventListener('DOMContentLoaded', async function () {
     getCodeBtn.addEventListener('click', () => {
         getCode();
         codeContainer.style.display = 'block';
-        authBtnContainer.style.display = 'block';
     });
 
     // Function to obtain user token

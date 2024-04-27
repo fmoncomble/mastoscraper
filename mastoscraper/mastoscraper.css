@@ -204,3 +204,9 @@ a.notice {
     color: inherit;
     font-weight: bold;
 }
+
+p#dismiss {
+    font-weight: bold;
+    text-decoration: underline;
+    cursor: pointer;
+}
