@@ -545,7 +545,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         let thisPhrase = thisPhraseInput.value;
         lang = langInput.value;
         let account = accountInput.value.replaceAll(' ', ' AND ');
-        if (allWords || thisPhrase || anyWord || noWord) {
+        if (allWords || thisPhrase) {
             queryUrl = queryUrl + 'q=';
         }
         if (allWords) {
@@ -558,20 +558,28 @@ document.addEventListener('DOMContentLoaded', async function () {
             queryUrl = queryUrl + '"' + thisPhrase + '"';
         }
         if (account) {
-            getIdUrl =
-                'https://' +
-                mastoInstance +
-                '/api/v1/accounts/lookup?acct=' +
-                account;
-            const idResponse = await fetch(getIdUrl);
-            if (idResponse.ok) {
-                const idData = await idResponse.json();
-                account = idData.id;
+            try {
+                getIdUrl =
+                    'https://' +
+                    mastoInstance +
+                    '/api/v1/accounts/lookup?acct=' +
+                    account;
+                const idResponse = await fetch(getIdUrl);
+                if (idResponse.ok) {
+                    const idData = await idResponse.json();
+                    account = idData.id;
+                } else {
+                    window.alert('Account not found');
+                    searchMsg.style.display = 'none';
+                    return;
+                }
+                if (allWords || thisPhrase) {
+                    queryUrl = queryUrl + '&';
+                }
+                queryUrl = queryUrl + 'account_id=' + account;
+            } catch (error) {
+                console.error(error);
             }
-            if (allWords || thisPhrase || anyWord || noWord || lang) {
-                queryUrl = queryUrl + '&';
-            }
-            queryUrl = queryUrl + 'account_id=' + account;
         }
         queryUrl = queryUrl + '&type=statuses&resolve=true';
         queryUrl = encodeURI(queryUrl);
@@ -963,6 +971,10 @@ ${text}
 
     // Assign role to reset button
     resetBtn.addEventListener('click', () => {
+        const inputs = searchContainer.querySelectorAll('input');
+        for (let input of inputs) {
+            input.value = '';
+        }
         location.reload();
     });
 });
