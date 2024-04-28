@@ -9,6 +9,10 @@ Si vous utilisez cette extension pour votre recherche, veuillez la référencer 
   
 Moncomble, F. (2024). *MastoScraper* (Version 0.4) [JavaScript]. Arras, France : Université d'Artois. Disponible à l'adresse : https://fmoncomble.github.io/mastoscraper/
 
+## Remarque importante
+Mastodon, qui fait partie du fedivers, n'est pas un réseau social comme les autres. Veuillez prendre le temps de réfléchir aux implications éthiques de l'utilisation que vous envisagez du contenu collecté, et de prendre connaissance des conditions d'utilisation des différentes instances dont vous récupérez les données.  
+Lisez [cet article](https://www.cell.com/patterns/pdf/S2666-3899(23)00323-9.pdf) pour en savoir plus.
+
 ## Installation
 ### Firefox (recommandé : mises à jour automatiques)
 [ ![Firefox add-on](https://github.com/fmoncomble/Figaro_extractor/assets/59739627/e4df008e-1aac-46be-a216-e6304a65ba97)](https://github.com/fmoncomble/mastoscraper/releases/latest/download/mastoscraper.xpi)  

@@ -10,6 +10,9 @@ If you use this extension for your research, please reference it as follows:
   
 Moncomble, F. (2024). *MastoScraper* (Version 0.4) [JavaScript]. Arras, France: Université d'Artois. Available at: https://fmoncomble.github.io/mastoscraper/
 
+## Important notice
+Mastodon, which forms part of the fediverse, is unlike most other social networks. Please reflect on the your planned use of the content you are scraping, and consider studying the terms and conditions of the various instances you are drawing data from.  
+Click [here](https://www.cell.com/patterns/pdf/S2666-3899(23)00323-9.pdf) for some relevant reading material.
 
 ## Installation
 ### Firefox (recommended: automatic updates)
