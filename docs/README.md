@@ -44,4 +44,4 @@ While the add-on is being authorized on the Chrome WebStore, you can test it by 
 - Click `Download` to collect the output or `Reset` to start afresh.
 
 ## Known limitations
-Searching by instance and date is not built into the Mastodon API: results are filtered from the query response, which may take some time depending on the chosen criteria.
+Searching by instance, language and date is not built into the Mastodon API, meaning that results are filtered from the whole query response, which may take some time depending on the chosen criteria.
