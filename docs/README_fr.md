@@ -14,8 +14,11 @@ Mastodon, qui fait partie du fedivers, n'est pas un réseau social comme les aut
 Lisez [cet article](https://www.cell.com/patterns/pdf/S2666-3899(23)00323-9.pdf) pour en savoir plus.
 
 ## Installation
-### Firefox (recommandé : mises à jour automatiques)
+### Firefox
 [ ![Firefox add-on](https://github.com/fmoncomble/Figaro_extractor/assets/59739627/e4df008e-1aac-46be-a216-e6304a65ba97)](https://github.com/fmoncomble/mastoscraper/releases/latest/download/mastoscraper.xpi)  
+### Chrome/Edge
+[![available-chrome-web-store4321](https://github.com/fmoncomble/mastoscraper/assets/59739627/748feefa-5a01-42e1-b3e5-b61e016e6ec7)](https://chromewebstore.google.com/detail/mastoscraper/ilgebclibaabhdhpgkfkkknpmblfnblg?hl=en-GB&authuser=0)  
+  
 N'oubliez pas d'épingler l'extension à la barre d'outils.
 
 ### Chrome/Edge
