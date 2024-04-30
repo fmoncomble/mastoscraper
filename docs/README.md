@@ -15,19 +15,12 @@ Mastodon, which forms part of the fediverse, is unlike most other social network
 Click [here](https://www.cell.com/patterns/pdf/S2666-3899(23)00323-9.pdf) for some relevant reading material.
 
 ## Installation
-### Firefox (recommended: automatic updates)
+### Firefox
 [![Firefox add-on](https://github.com/fmoncomble/Figaro_extractor/assets/59739627/e4df008e-1aac-46be-a216-e6304a65ba97)](https://github.com/fmoncomble/mastoscraper/releases/latest/download/mastoscraper.xpi)  
-Remember to pin the add-on to the toolbar.
-
 ### Chrome/Edge
-While the add-on is being authorized on the Chrome WebStore, you can test it by installing it in developer mode:
-- [Download the .zip archive](https://github.com/fmoncomble/mastoscraper/releases/latest/download/mastoscraper.zip)
-- Unzip the archive
-- Open the extensions manager: `chrome://extensions` or `edge://extensions`
-  - Activate "developer mode"
-  - Click "Load unpacked"
-  - Select the unzipped folder
-- Pin the add-on to the toolbar
+[![available-chrome-web-store4321](https://github.com/fmoncomble/mastoscraper/assets/59739627/83a7e643-4784-4095-92b6-30e908dc0200)](https://chromewebstore.google.com/detail/mastoscraper/ilgebclibaabhdhpgkfkkknpmblfnblg?hl=en-GB&authuser=0)  
+  
+Remember to pin the add-on to the toolbar.
  
 ## Instructions for use
 - Click the add-on's icon in the toolbar.
