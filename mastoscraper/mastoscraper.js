@@ -56,13 +56,10 @@ document.addEventListener('DOMContentLoaded', async function () {
     userToken = await retrieveCredential('mastousertoken');
 
     getUnderstand(function (understandResult) {
-        console.log('Retrieving notice understand');
         understand = understandResult;
         if (userToken && understand) {
             notice.style.display = 'none';
-            console.log('Notice understood');
         } else {
-            console.log('Notice not understood');
             notice.style.display = 'block';
         }
     });
@@ -70,14 +67,12 @@ document.addEventListener('DOMContentLoaded', async function () {
     function getUnderstand(callback) {
         chrome.storage.local.get(['understand'], function (result) {
             const understand = result.understand || '';
-            console.log('Notice understood?', understand);
             callback(understand);
         });
     }
 
     async function saveUnderstand() {
         chrome.storage.local.set({ understand: 'understand' }, function () {
-            console.log('Notice understood and dismissed');
             notice.style.display = 'none';
         });
     }
@@ -231,13 +226,17 @@ document.addEventListener('DOMContentLoaded', async function () {
         authBtnContainer.style.display = 'block';
     });
 
+
+    let clientID = await retrieveCredential('masto_client_id');
+    let clientSecret = await retrieveCredential('masto_client_secret');
     let clientCode = await retrieveCredential('masto_client_code');
     if (clientCode) {
         authBtnContainer.style.display = 'block';
     }
 
     // Reset authentication button
-    resetAuthBtn.addEventListener('click', () => {
+    resetAuthBtn.addEventListener('click', async () => {
+        await removeUserToken();
         saveCredential(
             instanceInput,
             mastoCred,
@@ -252,7 +251,6 @@ document.addEventListener('DOMContentLoaded', async function () {
             secretPlaceholder
         );
         saveCredential(codeInput, codeCred, codeSaveBtn, codePlaceholder);
-        removeUserToken();
         removeUnderstand();
         instanceContainer.style.display = 'block';
         idContainer.style.display = 'block';
@@ -277,12 +275,10 @@ document.addEventListener('DOMContentLoaded', async function () {
         getCredential(credType, function (credentialResult) {
             let credential = credentialResult;
             if (credential) {
-                console.log(credType + ' stored: ', credential);
                 inputElement.placeholder =
                     'Value stored: enter new value to reset';
                 buttonElement.textContent = 'Reset';
             } else {
-                console.log('No ' + credType + ' set');
             }
         });
     }
@@ -339,18 +335,12 @@ document.addEventListener('DOMContentLoaded', async function () {
     function getUserToken(callback) {
         chrome.storage.local.get(['mastousertoken'], function (result) {
             const mastousertoken = result.mastousertoken || '';
-            if (mastousertoken) {
-                console.log('User token?', mastousertoken);
-            } else {
-                console.log('User token not set');
-            }
             callback(mastousertoken);
         });
     }
 
     async function saveUserToken() {
         chrome.storage.local.set({ mastousertoken: userToken }, function () {
-            console.log('User token stored: ', userToken);
             allDone.style.display = 'block';
             setTimeout(() => {
                 authContainer.style.display = 'none';
@@ -364,16 +354,46 @@ document.addEventListener('DOMContentLoaded', async function () {
     }
 
     async function removeUserToken() {
+        mastoInstance = await retrieveCredential('mastoinstance');
+        const form = document.createElement('form');
+        const idRevInput = document.createElement('input');
+        idRevInput.setAttribute('name', 'client_id');
+        idRevInput.setAttribute('value', clientID.trim());
+        const secretRevInput = document.createElement('input');
+        secretRevInput.setAttribute('name', 'client_secret');
+        secretRevInput.setAttribute('value', clientSecret.trim());
+        const tokenRevInput = document.createElement('input');
+        tokenRevInput.setAttribute('name', 'token');
+        tokenRevInput.setAttribute('value', userToken);
+        form.appendChild(idRevInput);
+        form.appendChild(secretRevInput);
+        form.appendChild(tokenRevInput);
+
+        const formData = new FormData(form);
+        const url = 'https://' + mastoInstance + '/oauth/revoke';
+
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                body: formData,
+            });
+            if (!response.ok) {
+                window.alert('Could not revoke authorization: server responded with error ' + response.status);
+                throw new Error('Could not revoke token: ', response.status);
+            } else {
+                window.alert('Authorization successfully revoked');
+            }
+        } catch (error) {
+            console.error('Error: ', error);
+        }
         chrome.storage.local.remove('mastousertoken', function () {
             userToken = '';
-            console.log('User token reset');
         });
     }
 
     // Function to store credentials
     async function saveCredential(input, credType, button, placeholder) {
-        credential = input.value;
-        console.log(credType + ':', credential);
+        let credential = input.value;
         if (credential) {
             chrome.storage.local.set({ [credType]: credential }, function () {
                 button.style.backgroundColor = '#4a905f';
@@ -387,7 +407,6 @@ document.addEventListener('DOMContentLoaded', async function () {
                     button.textContent = 'Reset';
                 }, 2000);
             });
-            console.log(credType + ' set: ', credential);
         } else {
             chrome.storage.local.remove([credType], function () {
                 button.style.backgroundColor = '#4a905f';
@@ -401,7 +420,6 @@ document.addEventListener('DOMContentLoaded', async function () {
                     button.textContent = 'Save';
                 }, 2000);
             });
-            console.log(credType + ' reset');
         }
     }
 
@@ -409,7 +427,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     async function getCode() {
         // Retrieve credentials from storage
         mastoInstance = await retrieveCredential('mastoinstance');
-        let clientID = await retrieveCredential('masto_client_id');
+        clientID = await retrieveCredential('masto_client_id');
 
         if (!mastoInstance) {
             window.alert('Please enter your Mastodon instance');
@@ -447,8 +465,8 @@ document.addEventListener('DOMContentLoaded', async function () {
     async function authorize() {
         // Retrieve credentials from storage
         mastoInstance = await retrieveCredential('mastoinstance');
-        let clientID = await retrieveCredential('masto_client_id');
-        let clientSecret = await retrieveCredential('masto_client_secret');
+        clientID = await retrieveCredential('masto_client_id');
+        clientSecret = await retrieveCredential('masto_client_secret');
         let clientCode = await retrieveCredential('masto_client_code');
 
         if (!mastoInstance) {
@@ -462,16 +480,11 @@ document.addEventListener('DOMContentLoaded', async function () {
 
         // Build query form
         const form = document.getElementById('auth-form-2');
-        form.setAttribute('target', '_blank');
         const idAuthInput = document.getElementById('id-auth-input-2');
         const secretAuthInput = document.getElementById('secret-auth-input-2');
         const codeAuthInput = document.getElementById('code-auth-input');
         const uriInput = document.getElementById('redirect-input-2');
         const grantTypeInput = document.getElementById('granttype-input');
-        form.setAttribute(
-            'action',
-            'https://' + mastoInstance + '/oauth/token'
-        );
         grantTypeInput.setAttribute('value', 'authorization_code');
         codeAuthInput.setAttribute('value', clientCode.trim());
         idAuthInput.setAttribute('value', clientID.trim());
@@ -493,7 +506,6 @@ document.addEventListener('DOMContentLoaded', async function () {
             }
 
             const jsonData = await response.json();
-            console.log(jsonData);
             accessToken = jsonData.access_token;
             if (accessToken) {
                 userToken = accessToken;
@@ -532,11 +544,16 @@ document.addEventListener('DOMContentLoaded', async function () {
     // Logic to build query URL from inputs
     let queryUrl;
     let lang;
+    accountInput.addEventListener('change', () => {
+        accountInput.removeAttribute('style');
+    });
 
     async function buildQueryUrl() {
         mastoInstance = await retrieveCredential('mastoinstance');
         if (!mastoInstance) {
             window.alert('Please enter your Mastodon instance');
+            searchMsg.style.display = 'none';
+            return;
         }
         queryUrl = 'https://' + mastoInstance + '/api/v2/search?';
 
@@ -571,6 +588,9 @@ document.addEventListener('DOMContentLoaded', async function () {
                 } else {
                     window.alert('Account not found');
                     searchMsg.style.display = 'none';
+                    accountInput.style.outline = 'solid 2px #e60000';
+                    accountInput.style.border = 'solid 1px #e60000';
+                    accountInput.focus();
                     return;
                 }
                 if (allWords || thisPhrase) {
@@ -583,11 +603,10 @@ document.addEventListener('DOMContentLoaded', async function () {
         }
         queryUrl = queryUrl + '&type=statuses&resolve=true';
         queryUrl = encodeURI(queryUrl);
-        console.log('Query URL = ', queryUrl);
 
         // Fetch query response from server
         try {
-            if (!allWords && !thisPhrase && !anyWord) {
+            if (!allWords && !thisPhrase) {
                 window.alert('Please provide keywords');
                 searchMsg.style.display = 'none';
                 return;
@@ -605,14 +624,8 @@ document.addEventListener('DOMContentLoaded', async function () {
                     'Application not authorized: please authenticate with Mastodon'
                 );
                 authContainer.style.display = 'block';
-                codeInput.setAttribute(
-                    'placeholder',
-                    'Click "Get code" to obtain a new code'
-                );
-                tokenInput.setAttribute(
-                    'placeholder',
-                    'Click "Authorize" to obtain a new token'
-                );
+                authFold.style.display = 'block';
+                authUnfold.style.display = 'none';
                 throw new Error('User needs to authorize app');
             } else if (!response || !response.ok) {
                 window.alert(
@@ -659,20 +672,17 @@ document.addEventListener('DOMContentLoaded', async function () {
     let fileFormat = 'xml';
     formatSelect.addEventListener('change', () => {
         fileFormat = formatSelect.value;
-        console.log('File format changed to ', fileFormat);
         dlBtn.textContent = 'Download ' + fileFormat.toUpperCase();
     });
 
     let fromDate;
     fromDateInput.addEventListener('change', () => {
         fromDate = fromDateInput.value;
-        console.log('From date: ', fromDate);
     });
 
     let toDate;
     toDateInput.addEventListener('change', () => {
         toDate = toDateInput.value;
-        console.log('To date: ', toDate);
     });
 
     let searchInstances;
@@ -682,7 +692,6 @@ document.addEventListener('DOMContentLoaded', async function () {
             ''
         );
         searchInstances = searchInstanceInput.value.split(',');
-        console.log('Search instances = ', searchInstances);
     });
 
     let file;
@@ -776,7 +785,6 @@ document.addEventListener('DOMContentLoaded', async function () {
                     nextQueryUrl = queryUrl + '&max_id=' + id.toString();
                 }
                 nextQueryUrl = nextQueryUrl + '&limit=40';
-                console.log('Extracting query URL = ', nextQueryUrl);
                 const response = await fetch(nextQueryUrl, {
                     headers: {
                         Authorization: `Bearer ${userToken}`,
@@ -798,10 +806,6 @@ document.addEventListener('DOMContentLoaded', async function () {
                 }
                 const data = await response.json();
                 statuses = data.statuses;
-                console.log(
-                    'Number of statuses in next batch: ',
-                    statuses.length
-                );
                 if (
                     statuses.length == 0 ||
                     (tootCount > 1 && statuses.length <= 1)
@@ -809,7 +813,6 @@ document.addEventListener('DOMContentLoaded', async function () {
                     abort = true;
                 }
                 for (s of statuses) {
-                    console.log('Status being processed: ', s);
                     const parser = new DOMParser();
                     id = s.id;
                     if (tootSet.has(id)) {
@@ -824,28 +827,17 @@ document.addEventListener('DOMContentLoaded', async function () {
                     username = s.account.acct;
 
                     date = s.created_at;
-                    console.log('Toot date = ', date);
                     if (fromDate && date < fromDate) {
-                        console.log('From date = ', fromDate);
-                        console.log(
-                            date < fromDate,
-                            'Too old: stopping scrape'
-                        );
                         abort = true;
                         break;
                     }
                     if (toDate && date > toDate) {
-                        console.log('To date = ', toDate);
-                        console.log(date > toDate, 'Too recent: skipping toot');
                         continue;
                     }
 
                     let sInstance = username.split('@')[1];
                     if (searchInstances && searchInstances.length > 0) {
                         if (!searchInstances.includes(sInstance)) {
-                            console.log(
-                                'Not from list of search instances: skipping toot'
-                            );
                             continue;
                         }
                     }
@@ -860,9 +852,7 @@ document.addEventListener('DOMContentLoaded', async function () {
                         .replaceAll('<br>', '\n')
                         .replaceAll('<p>', '\n')
                         .replaceAll(/<.+?>/gu, '');
-                    console.log('Text before normalization: ', rawTextString);
                     text = rawTextString.normalize('NFC');
-                    console.log('Normalized text: ', text);
                     url = s.url;
 
                     if (fileFormat === 'xml') {

@@ -4,15 +4,19 @@ button.masto-scraper {
     font-weight: 400;
     font-size: 14px;
     font-family: inherit;
-    line-height: 18px;
-    padding: 8px;
+    padding: 7px 18px 6px;
+    height: auto;
     border: none;
     border-radius: 4px;
-    width: 70px;
-    transition: background-color 0.4s;
+    width: auto;
+    transition: background 0.3s linear;
     float: right;
 }
 
 button.masto-scraper:hover {
     background-color: #563ACC;
+}
+
+code {
+    transition: color 0.3s linear;
 }

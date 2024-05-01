@@ -51,11 +51,9 @@ if (isAppUrl(window.location.href)) {
         writeToClipboard(clientKey);
         clientKeyRow.style.color = '#4a905f';
         copyKeyBtn.style.backgroundColor = '#4a905f';
-        copyKeyBtn.textContent = 'Copied';
         setTimeout(() => {
             clientKeyRow.removeAttribute('style');
             copyKeyBtn.removeAttribute('style');
-            copyKeyBtn.textContent = 'Copy';
         }, 1000);
     });
 
@@ -63,11 +61,9 @@ if (isAppUrl(window.location.href)) {
         writeToClipboard(clientSecret);
         clientSecretRow.style.color = '#4a905f';
         copySecretBtn.style.backgroundColor = '#4a905f';
-        copySecretBtn.textContent = 'Copied';
         setTimeout(() => {
             clientSecretRow.removeAttribute('style');
             copySecretBtn.removeAttribute('style');
-            copySecretBtn.textContent = 'Copy';
         }, 1000);
     });
 }

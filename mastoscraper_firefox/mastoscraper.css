@@ -53,8 +53,8 @@ select.masto-scraper {
 }
 
 button#abort-btn {
-    color: #ff0000;
-    border-color: #ff0000;
+    color: #e60000;
+    border-color: #e60000;
     display: none;
 }
 
@@ -65,8 +65,8 @@ button#abort-btn:hover {
 
 button#reset-auth {
     width: auto;
-    color: #ff0000;
-    border-color: #ff0000;
+    color: #e60000;
+    border-color: #e60000;
     margin: 5px;
 }
 
@@ -131,13 +131,13 @@ div.fold
 
 div#auth-fold::after,
 div#search-fold::after {
-    content: '➖';
+    content: '—';
     float: right;
 }
 
 div#auth-unfold::after,
 div#search-unfold::after {
-    content: '➕';
+    content: '+';
     float: right;
 }
 
