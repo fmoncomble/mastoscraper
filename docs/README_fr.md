@@ -20,16 +20,6 @@ Lisez [cet article](https://www.cell.com/patterns/pdf/S2666-3899(23)00323-9.pdf)
 [![available-chrome-web-store4321](https://github.com/fmoncomble/mastoscraper/assets/59739627/748feefa-5a01-42e1-b3e5-b61e016e6ec7)](https://chromewebstore.google.com/detail/mastoscraper/ilgebclibaabhdhpgkfkkknpmblfnblg?hl=en-GB&authuser=0)  
   
 N'oubliez pas d'épingler l'extension à la barre d'outils.
-
-### Chrome/Edge
-En attendant la disponibilité sur le Chrome WebStore, vous pouvez tester l'extension en l'installant en mode développeur :
-- [Téléchargez l'archive .zip](https://github.com/fmoncomble/mastoscraper/releases/latest/download/mastoscraper.zip)
-- Décompressez l'archive
-- Ouvrez le gestionnaire d'extensions : `chrome://extensions` ou `edge://extensions`
-  - Activez le « mode développeur »
-  - Cliquez sur « charger l'extension non empaquetée »
-  - Sélectionnez le dossier décompressé
-- Épinglez l'extension à la barre d'outils
  
 ## Mode d'emploi
 - Cliquez sur l'icône de l'extension dans la barre d'outils.
