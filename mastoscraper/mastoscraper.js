@@ -902,6 +902,7 @@ ${text}
                     } else if (fileFormat === 'txt') {
                         file = file + `\n\n${text}\n\n——————`;
                     } else if (fileFormat === 'json') {
+                        text = text.replaceAll('\n', ' ');
                         file[id] = {
                             username: `${username}`,
                             date: `${date}`,
