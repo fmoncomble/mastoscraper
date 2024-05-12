@@ -8,7 +8,7 @@ An extension for extracting and downloading toots (posts on Mastodon) for text m
 ### Cite this program
 If you use this extension for your research, please reference it as follows:  
   
-Moncomble, F. (2024). *MastoScraper* (Version 0.4) [JavaScript]. Arras, France: Université d'Artois. Available at: https://fmoncomble.github.io/mastoscraper/
+Moncomble, F. (2024). *MastoScraper* (Version 0.5) [JavaScript]. Arras, France: Université d'Artois. Available at: https://fmoncomble.github.io/mastoscraper/
 
 ## Important notice
 Mastodon, which forms part of the fediverse, is unlike most other social networks. Please reflect on the your planned use of the content you are scraping, and consider studying the terms and conditions of the various instances you are drawing data from.  
