@@ -31,6 +31,7 @@ Remember to pin the add-on to the toolbar.
       - When initiating the import process, open the "Textual planes" section and type `ref` in the field labelled "Out of text to edit"
     - `TXT` for plain text
     - `CSV`
+    - `XLSX`
     - `JSON`
 - (Optional) Enter the maximum number of toots to collect.
 - You can stop the process at any time by clicking `Abort`.
