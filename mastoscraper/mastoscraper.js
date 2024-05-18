@@ -779,7 +779,9 @@ document.addEventListener('DOMContentLoaded', async function () {
             tootCount = tootCount - 1;
             resultsMsg.textContent = tootCount + ' toot(s) extracted';
             if (skippedItems > 0) {
-                const skippedItemsText = document.createTextNode(` — ${skippedItems} toot(s) ignored: too long for XLSX`);
+                const skippedItemsText = document.createTextNode(
+                    ` — ${skippedItems} toot(s) ignored: too long for XLSX`
+                );
                 resultsMsg.appendChild(skippedItemsText);
             }
             dlBtn.textContent = 'Download ' + fileFormat.toUpperCase();
@@ -1017,32 +1019,47 @@ ${text}
 
     // Function to download output file
     function download() {
-        if (fileFormat === 'xml') {
-            var myBlob = new Blob([file], { type: 'application/xml' });
-        } else if (fileFormat === 'json') {
-            var fileString = JSON.stringify(file);
-            var myBlob = new Blob([fileString], { type: 'text/plain' });
-        } else if (fileFormat === 'txt') {
-            var myBlob = new Blob([file], { type: 'text/plain' });
-        } else if (fileFormat === 'csv') {
-            function convertToCsv(data) {
-                const header = Object.keys(data[0]).join('\t');
-                const rows = data.map((obj) => Object.values(obj).join('\t'));
-                return [header, ...rows].join('\n');
+        try {
+            if (fileFormat === 'xml') {
+                var myBlob = new Blob([file], { type: 'application/xml' });
+            } else if (fileFormat === 'json') {
+                var fileString = JSON.stringify(file);
+                var myBlob = new Blob([fileString], { type: 'text/plain' });
+            } else if (fileFormat === 'txt') {
+                var myBlob = new Blob([file], { type: 'text/plain' });
+            } else if (fileFormat === 'csv') {
+                function convertToCsv(data) {
+                    const header = Object.keys(data[0]).join('\t');
+                    const rows = data.map((obj) =>
+                        Object.values(obj).join('\t')
+                    );
+                    return [header, ...rows].join('\n');
+                }
+                const csvString = convertToCsv(csvData);
+                var myBlob = new Blob([csvString], { type: 'text/csv' });
+            } else if (fileFormat === 'xlsx') {
+                XLSX.utils.book_append_sheet(file, sheet, 'Toots');
+                XLSX.writeFile(file, 'toots.xlsx');
             }
-            const csvString = convertToCsv(csvData);
-            var myBlob = new Blob([csvString], { type: 'text/csv' });
-        } else if (fileFormat === 'xlsx') {
-            XLSX.utils.book_append_sheet(file, sheet, 'Toots');
-            XLSX.writeFile(file, 'toots.xlsx');
-        }
-        if (fileFormat !== 'xlsx') {
-            var url = window.URL.createObjectURL(myBlob);
-            var anchor = document.createElement('a');
-            anchor.href = url;
-            anchor.download = `toots.${fileFormat}`;
-            anchor.click();
-            window.URL.revokeObjectURL(url);
+            if (fileFormat !== 'xlsx') {
+                var url = window.URL.createObjectURL(myBlob);
+                var anchor = document.createElement('a');
+                anchor.href = url;
+                anchor.download = `toots.${fileFormat}`;
+                anchor.click();
+                window.URL.revokeObjectURL(url);
+            }
+        } catch (error) {
+            console.error(error);
+            window.alert(
+                `${fileFormat.toUpperCase()} file creation failed. Try another output format.`
+            );
+            formatSelect.disabled = false;
+            maxResultsInput.disabled = false;
+            extractBtn.disabled = false;
+            dlBtn.style.display = 'none';
+            resetBtn.style.display = 'none';
+            dlResult.textContent = '';
         }
     }
 
