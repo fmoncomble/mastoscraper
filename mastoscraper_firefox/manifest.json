@@ -1,7 +1,7 @@
 {
     "manifest_version": 2,
     "name": "MastoScraper",
-    "version": "0.5.1",
+    "version": "0.6",
     "description": "A browser extension to scrape Mastodon search results",
     "homepage_url": "https://fmoncomble.github.io/mastoscraper/",
     "permissions": ["storage", "clipboardWrite", "<all_urls>"],
