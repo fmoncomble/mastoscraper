@@ -7,7 +7,7 @@ Une extension pour extraire et télécharger des pouets (posts sur Mastodon) à 
 ### Citer ce programme
 Si vous utilisez cette extension pour votre recherche, veuillez la référencer comme suit :  
   
-Moncomble, F. (2024). *MastoScraper* (Version 0.5) [JavaScript]. Arras, France : Université d'Artois. Disponible à l'adresse : https://fmoncomble.github.io/mastoscraper/
+Moncomble, F. (2024). *MastoScraper* (Version 0.6) [JavaScript]. Arras, France : Université d'Artois. Disponible à l'adresse : https://fmoncomble.github.io/mastoscraper/
 
 ## Remarque importante
 Mastodon, qui fait partie du fedivers, n'est pas un réseau social comme les autres. Veuillez prendre le temps de réfléchir aux implications éthiques de l'utilisation que vous envisagez du contenu collecté, et de prendre connaissance des conditions d'utilisation des différentes instances dont vous récupérez les données.  
