@@ -8,7 +8,7 @@ An extension for extracting and downloading toots (posts on Mastodon) for text m
 ### Cite this program
 If you use this extension for your research, please reference it as follows:  
   
-Moncomble, F. (2024). *MastoScraper* (Version 0.6) [JavaScript]. Arras, France: Université d'Artois. Available at: https://fmoncomble.github.io/mastoscraper/
+Moncomble, F. (2024). *MastoScraper* (Version 0.7) [JavaScript]. Arras, France: Université d'Artois. Available at: https://fmoncomble.github.io/mastoscraper/
 
 ## Important notice
 Mastodon, which forms part of the fediverse, is unlike most other social networks. Please reflect on the your planned use of the content you are scraping, and consider studying the terms and conditions of the various instances you are drawing data from.  
@@ -38,4 +38,4 @@ Remember to pin the add-on to the toolbar.
 - Click `Download` to collect the output or `Reset` to start afresh.
 
 ## Known limitations
-Searching by instance, language and date is not built into the Mastodon API, meaning that results are filtered from the whole query response, which may take some time depending on the chosen criteria.
+Searching by instance and language is not built into the Mastodon API, meaning that results are filtered from the whole query response, which may take some time depending on the chosen criteria.
