@@ -1,11 +1,10 @@
 {
     "manifest_version": 3,
     "name": "MastoScraper",
-    "version": "0.7",
+    "version": "0.8",
     "description": "A browser extension to scrape Mastodon search results",
     "homepage_url": "https://fmoncomble.github.io/mastoscraper/",
-    "permissions": ["storage", "clipboardWrite"],
-    "host_permissions": ["<all_urls>"],
+    "permissions": ["storage", "identity"],
     "icons": {
         "48": "icons/icon-48.png",
         "96": "icons/icon-96.png"
@@ -13,12 +12,5 @@
     "action": {
         "default_popup": "popup.html",
         "default_icon": "icons/icon-32.png"
-    },
-    "content_scripts": [
-        {
-            "matches": ["*://*/settings/applications/*"],
-            "js": ["app_content.js"],
-            "css": ["app_content.css"]
-        }
-    ]
+    }
 }

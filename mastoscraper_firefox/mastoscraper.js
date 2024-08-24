@@ -10,19 +10,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     const instanceContainer = document.getElementById('instance-container');
     const instanceInput = document.getElementById('instance-input');
     const instanceSaveBtn = document.getElementById('instance-save');
-    const idContainer = document.getElementById('id-container');
-    const idInput = document.getElementById('id-input');
-    const idSaveBtn = document.getElementById('id-save');
-    const secretContainer = document.getElementById('secret-container');
-    const secretInput = document.getElementById('secret-input');
-    const secretSaveBtn = document.getElementById('secret-save');
-    const getCodeBtn = document.getElementById('get-code-btn');
-    const codeContainer = document.getElementById('code-container');
-    const codeInput = document.getElementById('code-input');
-    const codeSaveBtn = document.getElementById('code-save');
     const allDone = document.getElementById('all-done');
-    const authBtnContainer = document.getElementById('auth-btn-container');
-    const authBtn = document.getElementById('auth-btn');
     const resetAuthBtn = document.getElementById('reset-auth');
     const searchFold = document.getElementById('search-fold');
     const searchUnfold = document.getElementById('search-unfold');
@@ -57,11 +45,101 @@ document.addEventListener('DOMContentLoaded', async function () {
     const notice = document.getElementById('notice');
     const dismissBtn = document.getElementById('dismiss');
 
+    // Declare credentials
+    let mastoInstance;
+    let clientId;
+    let clientSecret;
+    chrome.storage.local.get(['mastoinstance'], (result) => {
+        mastoInstance = result.mastoinstance;
+    });
+    chrome.storage.local.get(['mastoclientid'], (result) => {
+        clientId = result.mastoclientid;
+    });
+    chrome.storage.local.get(['mastoclientsecret'], (result) => {
+        clientSecret = result.mastoclientsecret;
+    });
+
     // Manage notice
     let understand;
     let userToken;
-    userToken = await retrieveCredential('mastousertoken');
 
+    //Functions to handle user token
+    getUserToken(function (userTokenResult) {
+        userToken = userTokenResult;
+
+        if (userToken) {
+            instSpan.style.display = 'none';
+            instDiv.style.display = 'none';
+            instanceContainer.style.display = 'none';
+            allDone.style.display = 'block';
+            searchContainer.style.display = 'block';
+            searchFold.style.display = 'block';
+            searchUnfold.style.display = 'none';
+        } else {
+            authContainer.style.display = 'block';
+            authFold.style.display = 'block';
+            authUnfold.style.display = 'none';
+            searchContainer.style.display = 'none';
+            searchFold.style.display = 'none';
+            searchUnfold.style.display = 'block';
+        }
+    });
+
+    function getUserToken(callback) {
+        chrome.storage.local.get(['mastousertoken'], function (result) {
+            const mastousertoken = result.mastousertoken || '';
+            callback(mastousertoken);
+        });
+    }
+
+    async function saveUserToken() {
+        chrome.storage.local.set({ mastousertoken: userToken }, function () {
+            allDone.style.display = 'block';
+            instSpan.style.display = 'none';
+            instDiv.style.display = 'none';
+            instanceContainer.style.display = 'none';
+            setTimeout(() => {
+                authContainer.style.display = 'none';
+                authFold.style.display = 'none';
+                authUnfold.style.display = 'block';
+                searchContainer.style.display = 'block';
+                searchFold.style.display = 'block';
+                searchUnfold.style.display = 'none';
+            }, 1000);
+        });
+    }
+
+    async function removeUserToken() {
+        const formData = new FormData();
+        formData.append('client_id', clientId);
+        formData.append('client_secret', clientSecret);
+        formData.append('token', userToken);
+
+        const url = 'https://' + mastoInstance + '/oauth/revoke';
+
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                body: formData,
+            });
+            if (!response.ok) {
+                window.alert(
+                    'Could not revoke authorization: server responded with error ' +
+                        response.status
+                );
+                throw new Error('Could not revoke token: ', response.status);
+            } else {
+                window.alert('Authorization successfully revoked');
+            }
+        } catch (error) {
+            console.error('Error: ', error);
+        }
+        chrome.storage.local.remove('mastousertoken', function () {
+            userToken = null;
+        });
+    }
+
+    // Functions to handle notice
     getUnderstand(function (understandResult) {
         understand = understandResult;
         if (userToken && understand) {
@@ -135,420 +213,125 @@ document.addEventListener('DOMContentLoaded', async function () {
         searchUnfold.style.display = 'none';
     });
 
-    // Store credentials
-    let mastoCred = 'mastoinstance';
-    let mastoInstance;
-    let idCred = 'masto_client_id';
-    let secretCred = 'masto_client_secret';
-    let codeCred = 'masto_client_code';
-
-    let instancePlaceholder = 'Enter your Mastodon instance (example.instance)';
-    let idPlaceholder = 'Enter your app client ID';
-    let secretPlaceholder = 'Enter your app client secret';
-    let codePlaceholder = 'Enter your code';
-
-    let mastoDevUrl;
-
-    // Store Mastodon instance
+    // Assign function to Mastodon instance input & button
     instanceInput.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
-            saveCredential(
-                instanceInput,
-                mastoCred,
-                instanceSaveBtn,
-                instancePlaceholder
-            );
             if (instanceInput.value) {
-                mastoDevUrl =
-                    'https://' + instanceInput.value + '/settings/applications';
-                let devTab = chrome.tabs.create({
-                    url: mastoDevUrl,
+                mastoInstance = instanceInput.value.trim();
+                if (mastoInstance.startsWith('http')) {
+                    mastoInstance = mastoInstance.split('/')[2];
+                }
+                chrome.storage.local.set({
+                    mastoinstance: mastoInstance,
                 });
-                devTab;
-                idInput.focus();
+                authenticate();
+            } else {
+                window.alert('Entrez votre instance Mastodon');
+                instanceInput.focus();
             }
         }
     });
     instanceSaveBtn.addEventListener('click', () => {
-        saveCredential(
-            instanceInput,
-            mastoCred,
-            instanceSaveBtn,
-            instancePlaceholder
-        );
         if (instanceInput.value) {
-            mastoDevUrl =
-                'https://' + instanceInput.value + '/settings/applications';
-            let devTab = chrome.tabs.create({
-                url: mastoDevUrl,
+            mastoInstance = instanceInput.value.trim();
+            if (mastoInstance.startsWith('http')) {
+                mastoInstance = mastoInstance.split('/')[2];
+            }
+            chrome.storage.local.set({
+                mastoinstance: mastoInstance,
             });
-            devTab;
-            idInput.focus();
+            authenticate();
+        } else {
+            window.alert('Entrez votre instance Mastodon');
+            instanceInput.focus();
         }
     });
 
-    // Store app ID
-    idInput.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-            saveCredential(idInput, idCred, idSaveBtn, idPlaceholder);
-            secretInput.focus();
+    // Oauth flow function
+    async function authenticate() {
+        let instance = instanceInput.value.trim();
+        let redirectUri;
+        const userAgent = navigator.userAgent;
+        if (userAgent.indexOf('Chrome') > -1) {
+            redirectUri = `https://${chrome.runtime.id}.chromiumapp.org/`;
+        } else if (userAgent.indexOf('Firefox') > -1) {
+            redirectUri = browser.identity.getRedirectURL();
         }
-    });
-    idSaveBtn.addEventListener('click', () => {
-        saveCredential(idInput, idCred, idSaveBtn, idPlaceholder);
-        secretInput.focus();
-    });
-
-    // Store app secret
-    secretInput.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-            saveCredential(
-                secretInput,
-                secretCred,
-                secretSaveBtn,
-                secretPlaceholder
+        console.log('Redirect URI = ', redirectUri);
+        let createAppUrl = `https://${instance}/api/v1/apps`;
+        let response = await fetch(createAppUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                client_name: 'MastoScraper',
+                redirect_uris: redirectUri,
+                scopes: 'read',
+                website: redirectUri,
+            }),
+        });
+        if (!response.ok) {
+            let errorData = await response.json();
+            console.error('Error creating app: ', response.status, errorData);
+            return;
+        } else if (response && response.ok) {
+            let data = await response.json();
+            clientId = data.client_id;
+            chrome.storage.local.set({ mastoclientid: clientId });
+            clientSecret = data.client_secret;
+            chrome.storage.local.set({ mastoclientsecret: clientSecret });
+            console.log(
+                `App created with ID ${clientId} and secret ${clientSecret}`
             );
-            getCodeBtn.style.display = 'block';
         }
-    });
-    secretSaveBtn.addEventListener('click', () => {
-        saveCredential(
-            secretInput,
-            secretCred,
-            secretSaveBtn,
-            secretPlaceholder
+        chrome.identity.launchWebAuthFlow(
+            {
+                url: `https://${instanceInput.value}/oauth/authorize?client_id=${clientId}&response_type=code&redirect_uri=${redirectUri}&scope=read`,
+                interactive: true,
+            },
+            (redirectUrl) => {
+                if (chrome.runtime.lastError || !redirectUrl) {
+                    console.error(chrome.runtime.lastError);
+                    return;
+                }
+                const urlParams = new URLSearchParams(
+                    new URL(redirectUrl).search
+                );
+                const code = urlParams.get('code');
+                fetch(`https://${instance}/oauth/token`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams({
+                        client_id: clientId,
+                        client_secret: clientSecret,
+                        grant_type: 'authorization_code',
+                        code: code,
+                        redirect_uri: redirectUri,
+                    }),
+                })
+                    .then((response) => response.json())
+                    .then((data) => {
+                        userToken = data.access_token;
+                        saveUserToken();
+                        console.log('Access token:', userToken);
+                    })
+                    .catch((error) => console.error('Error: ', error));
+            }
         );
-        getCodeBtn.style.display = 'block';
-    });
-
-    // Store and declare authentication code
-    codeInput.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-            saveCredential(codeInput, codeCred, codeSaveBtn, codePlaceholder);
-            authBtnContainer.style.display = 'block';
-        }
-    });
-    codeSaveBtn.addEventListener('click', () => {
-        saveCredential(codeInput, codeCred, codeSaveBtn, codePlaceholder);
-        authBtnContainer.style.display = 'block';
-    });
-
-    let clientID = await retrieveCredential('masto_client_id');
-    let clientSecret = await retrieveCredential('masto_client_secret');
-    let clientCode = await retrieveCredential('masto_client_code');
-    if (clientCode) {
-        authBtnContainer.style.display = 'block';
     }
 
     // Reset authentication button
     resetAuthBtn.addEventListener('click', async () => {
         await removeUserToken();
-        saveCredential(
-            instanceInput,
-            mastoCred,
-            instanceSaveBtn,
-            instancePlaceholder
-        );
-        saveCredential(idInput, idCred, idSaveBtn, idPlaceholder);
-        saveCredential(
-            secretInput,
-            secretCred,
-            secretSaveBtn,
-            secretPlaceholder
-        );
-        saveCredential(codeInput, codeCred, codeSaveBtn, codePlaceholder);
         removeUnderstand();
         instanceContainer.style.display = 'block';
-        idContainer.style.display = 'block';
-        secretContainer.style.display = 'block';
-        getCodeBtn.style.display = 'none';
-        codeContainer.style.display = 'none';
-        authBtnContainer.style.display = 'none';
         allDone.style.display = 'none';
         searchContainer.style.display = 'none';
         location.reload();
     });
-
-    // Functions to check for credentials
-    function getCredential(credType, callback) {
-        chrome.storage.local.get([credType], function (result) {
-            const credential = result[credType] || '';
-            callback(credential);
-        });
-    }
-
-    function handleCredential(credType, inputElement, buttonElement) {
-        getCredential(credType, function (credentialResult) {
-            let credential = credentialResult;
-            if (credential) {
-                inputElement.placeholder =
-                    'Value stored: enter new value to reset';
-                buttonElement.textContent = 'Reset';
-            } else {
-            }
-        });
-    }
-
-    handleCredential(
-        'mastoinstance',
-        instanceInput,
-        instanceSaveBtn,
-        instancePlaceholder
-    );
-    handleCredential('masto_client_id', idInput, idSaveBtn, idPlaceholder);
-    handleCredential(
-        'masto_client_secret',
-        secretInput,
-        secretSaveBtn,
-        secretPlaceholder
-    );
-    handleCredential(
-        'masto_client_code',
-        codeInput,
-        codeSaveBtn,
-        codePlaceholder
-    );
-
-    //Functions to handle user token
-    getUserToken(function (userTokenResult) {
-        userToken = userTokenResult;
-
-        if (userToken) {
-            instSpan.style.display = 'none';
-            instDiv.style.display = 'none';
-            instanceContainer.style.display = 'none';
-            idContainer.style.display = 'none';
-            secretContainer.style.display = 'none';
-            getCodeBtn.style.display = 'none';
-            codeContainer.style.display = 'none';
-            authBtnContainer.style.display = 'none';
-            allDone.style.display = 'block';
-            searchContainer.style.display = 'block';
-            searchFold.style.display = 'block';
-            searchUnfold.style.display = 'none';
-        } else {
-            authContainer.style.display = 'block';
-            authFold.style.display = 'block';
-            authUnfold.style.display = 'none';
-            searchContainer.style.display = 'none';
-            searchFold.style.display = 'none';
-            searchUnfold.style.display = 'block';
-            authBtnContainer.style.display = 'none';
-            getCodeBtn.style.display = 'none';
-        }
-    });
-
-    function getUserToken(callback) {
-        chrome.storage.local.get(['mastousertoken'], function (result) {
-            const mastousertoken = result.mastousertoken || '';
-            callback(mastousertoken);
-        });
-    }
-
-    async function saveUserToken() {
-        chrome.storage.local.set({ mastousertoken: userToken }, function () {
-            allDone.style.display = 'block';
-            setTimeout(() => {
-                authContainer.style.display = 'none';
-                authFold.style.display = 'none';
-                authUnfold.style.display = 'block';
-                searchContainer.style.display = 'block';
-                searchFold.style.display = 'block';
-                searchUnfold.style.display = 'none';
-            }, 1000);
-        });
-    }
-
-    async function removeUserToken() {
-        mastoInstance = await retrieveCredential('mastoinstance');
-        const form = document.createElement('form');
-        const idRevInput = document.createElement('input');
-        idRevInput.setAttribute('name', 'client_id');
-        idRevInput.setAttribute('value', clientID.trim());
-        const secretRevInput = document.createElement('input');
-        secretRevInput.setAttribute('name', 'client_secret');
-        secretRevInput.setAttribute('value', clientSecret.trim());
-        const tokenRevInput = document.createElement('input');
-        tokenRevInput.setAttribute('name', 'token');
-        tokenRevInput.setAttribute('value', userToken);
-        form.appendChild(idRevInput);
-        form.appendChild(secretRevInput);
-        form.appendChild(tokenRevInput);
-
-        const formData = new FormData(form);
-        const url = 'https://' + mastoInstance + '/oauth/revoke';
-
-        try {
-            const response = await fetch(url, {
-                method: 'POST',
-                body: formData,
-            });
-            if (!response.ok) {
-                window.alert(
-                    'Could not revoke authorization: server responded with error ' +
-                        response.status
-                );
-                throw new Error('Could not revoke token: ', response.status);
-            } else {
-                window.alert('Authorization successfully revoked');
-            }
-        } catch (error) {
-            console.error('Error: ', error);
-        }
-        chrome.storage.local.remove('mastousertoken', function () {
-            userToken = '';
-        });
-    }
-
-    // Function to store credentials
-    async function saveCredential(input, credType, button, placeholder) {
-        let credential = input.value;
-        if (credential) {
-            chrome.storage.local.set({ [credType]: credential }, function () {
-                button.style.backgroundColor = '#4a905f';
-                button.style.color = 'white';
-                button.style.borderColor = '#4a905f';
-                button.textContent = 'Saved';
-                input.placeholder = 'Value stored: enter new value to reset';
-                input.value = '';
-                setTimeout(() => {
-                    button.removeAttribute('style');
-                    button.textContent = 'Reset';
-                }, 2000);
-            });
-        } else {
-            chrome.storage.local.remove([credType], function () {
-                button.style.backgroundColor = '#4a905f';
-                button.style.color = 'white';
-                button.style.borderColor = '#4a905f';
-                button.textContent = 'Value reset';
-                input.value = '';
-                input.placeholder = placeholder;
-                setTimeout(() => {
-                    button.removeAttribute('style');
-                    button.textContent = 'Save';
-                }, 2000);
-            });
-        }
-    }
-
-    // Function to obtain authentication code
-    async function getCode() {
-        // Retrieve credentials from storage
-        mastoInstance = await retrieveCredential('mastoinstance');
-        clientID = await retrieveCredential('masto_client_id');
-
-        if (!mastoInstance) {
-            window.alert('Please enter your Mastodon instance');
-            return;
-        }
-        if (!clientID) {
-            window.alert('Please provide authentication details');
-            return;
-        }
-
-        // Build query form
-        const form = document.getElementById('auth-form-1');
-        form.setAttribute('target', '_blank');
-        const idAuthInput = document.getElementById('id-auth-input');
-        const uriInput = document.getElementById('redirect-input');
-        const restypeInput = document.getElementById('restype-input');
-        form.setAttribute(
-            'action',
-            'https://' + mastoInstance + '/oauth/authorize'
-        );
-        restypeInput.setAttribute('value', 'code');
-        idAuthInput.setAttribute('value', clientID.trim());
-        uriInput.setAttribute('value', 'urn:ietf:wg:oauth:2.0:oob');
-
-        form.submit();
-    }
-
-    getCodeBtn.addEventListener('click', () => {
-        getCode();
-        codeContainer.style.display = 'block';
-        codeInput.focus();
-    });
-
-    // Function to obtain user token
-    async function authorize() {
-        // Retrieve credentials from storage
-        mastoInstance = await retrieveCredential('mastoinstance');
-        clientID = await retrieveCredential('masto_client_id');
-        clientSecret = await retrieveCredential('masto_client_secret');
-        let clientCode = await retrieveCredential('masto_client_code');
-
-        if (!mastoInstance) {
-            window.alert('Please enter your Mastodon instance');
-            return;
-        }
-        if (!clientID || !clientSecret || !clientCode) {
-            window.alert('Please provide authentication details');
-            return;
-        }
-
-        // Build query form
-        const form = document.getElementById('auth-form-2');
-        const idAuthInput = document.getElementById('id-auth-input-2');
-        const secretAuthInput = document.getElementById('secret-auth-input-2');
-        const codeAuthInput = document.getElementById('code-auth-input');
-        const uriInput = document.getElementById('redirect-input-2');
-        const grantTypeInput = document.getElementById('granttype-input');
-        grantTypeInput.setAttribute('value', 'authorization_code');
-        codeAuthInput.setAttribute('value', clientCode.trim());
-        idAuthInput.setAttribute('value', clientID.trim());
-        secretAuthInput.setAttribute('value', clientSecret.trim());
-        uriInput.setAttribute('value', 'urn:ietf:wg:oauth:2.0:oob');
-
-        const formData = new FormData(form);
-        const url = 'https://' + mastoInstance + '/oauth/token';
-
-        try {
-            const response = await fetch(url, {
-                method: 'POST',
-                body: formData,
-            });
-
-            if (!response.ok) {
-                window.alert('There was an error during authorization');
-                throw new Error('Network response was not ok');
-            }
-
-            const jsonData = await response.json();
-            accessToken = jsonData.access_token;
-            if (accessToken) {
-                userToken = accessToken;
-                await saveUserToken();
-                instSpan.style.display = 'none';
-                instDiv.style.display = 'none';
-                instanceContainer.style.display = 'none';
-                idContainer.style.display = 'none';
-                secretContainer.style.display = 'none';
-                getCodeBtn.style.display = 'none';
-                codeContainer.style.display = 'none';
-                authBtnContainer.style.display = 'none';
-            } else {
-                window.alert('Could not retrieve access token');
-                throw new Error('Could not retrieve access token');
-            }
-        } catch (error) {
-            console.error('Error:', error);
-        }
-    }
-
-    authBtn.addEventListener('click', async () => {
-        authorize();
-    });
-
-    // Function to retrieve credential from storage
-    function retrieveCredential(credType) {
-        return new Promise((resolve, reject) => {
-            chrome.storage.local.get([credType], function (result) {
-                const credential = result[credType] || '';
-                resolve(credential);
-            });
-        });
-    }
 
     // Logic to build query URL from inputs
     let queryUrl;
@@ -587,7 +370,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     });
 
     async function buildQueryUrl() {
-        mastoInstance = await retrieveCredential('mastoinstance');
+        // mastoInstance = await retrieveCredential('mastoinstance');
         if (!mastoInstance) {
             window.alert('Please enter your Mastodon instance');
             searchMsg.style.display = 'none';
@@ -691,7 +474,7 @@ document.addEventListener('DOMContentLoaded', async function () {
                 searchMsg.style.display = 'none';
                 return;
             }
-            userToken = await retrieveCredential('mastousertoken');
+            // userToken = await retrieveCredential('mastousertoken');
             const response = await fetch(queryUrl, {
                 headers: {
                     Authorization: `Bearer ${userToken}`,
